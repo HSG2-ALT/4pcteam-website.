@@ -1,640 +1,215 @@
-
 <!DOCTYPE html>
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Wallet & POS Pro - Ultimate Edition</title>
-    <!-- Βιβλιοθήκη Barcode -->
-    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4PCTEAM | Roblox Development Group</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #1a73e8;
-            --bg: #f8f9fa;
-            --card-radius: 16px;
-            --text-dark: #202124;
-            --text-light: #5f6368;
-            --shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+            --bg-color: #0b0f19;
+            --card-bg: #131b2e;
+            --accent: #00ffcc;
+            --accent-purple: #9d4edd;
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg);
-            margin: 0;
-            padding: 0;
-            padding-bottom: 80px;
-            color: var(--text-dark);
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            overflow-x: hidden;
+        }
+
+        /* Ambient Glow Background Effect */
+        .glow-sphere {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(0, 255, 204, 0.15) 0%, rgba(157, 78, 221, 0.05) 60%, transparent 100%);
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: -1;
+            border-radius: 50%;
+            pointer-events: none;
         }
 
         header {
-            background-color: white;
-            padding: 15px 20px;
-            box-shadow: var(--shadow);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        header h1 { margin: 0; font-size: 22px; color: var(--primary); }
-        
-        .screen { display: none; padding: 20px; }
-        .active-screen { display: block; }
-
-        .wallet-card {
-            color: white;
-            border-radius: var(--card-radius);
-            padding: 20px;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-            position: relative;
-            min-height: 110px;
-            cursor: pointer;
-            transition: transform 0.2s;
-            background-size: cover !important;
-            background-position: center !important;
-        }
-        .wallet-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: var(--card-radius);
-            z-index: 1;
-        }
-        .wallet-card > * {
-            position: relative;
-            z-index: 2;
-        }
-        .wallet-card:active { transform: scale(0.98); }
-        .wallet-card h3 { margin: 0 0 10px 0; font-size: 18px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); }
-        .wallet-card .card-number { font-size: 20px; letter-spacing: 1px; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); }
-        
-        .delete-card-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: rgba(217, 48, 37, 0.8);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            font-size: 14px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 3;
+            text-align: center;
+            padding: 50px 20px 20px 20px;
         }
 
-        .add-section {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: var(--shadow);
-            margin-bottom: 20px;
-        }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
-        .form-control { width: 100%; padding: 12px; border: 1px solid #dadce0; border-radius: 8px; box-sizing: border-box; font-size: 16px;}
-        
-        .color-picker { display: flex; gap: 10px; }
-        .color-dot { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
-        .color-dot.active { border-color: #333; }
-
-        .pos-terminal {
-            background: #202124;
-            color: #00ff41;
-            border-radius: 12px;
-            padding: 20px;
-            font-family: 'Courier New', Courier, monospace;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
-        }
-        .pos-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        .live-badge {
-            background: rgba(52, 168, 83, 0.2);
-            color: #34a853;
-            padding: 4px 10px;
+        .logo-badge {
+            display: inline-block;
+            background: rgba(0, 255, 204, 0.1);
+            color: var(--accent);
+            border: 1px solid rgba(0, 255, 204, 0.3);
+            padding: 6px 16px;
             border-radius: 20px;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            border: 1px solid #34a853;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
-        .live-dot { width: 8px; height: 8px; background: #34a853; border-radius: 50%; animation: pulse-dot 1.5s infinite; }
-        @keyframes pulse-dot { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
 
-        .pos-screen {
-            border: 2px solid #444;
-            background: #000;
+        h1 {
+            font-size: 42px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #ffffff 30%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            font-size: 16px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
             padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            min-height: 90px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 30px 20px;
+            text-align: center;
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            text-align: center;
-        }
-        .pos-screen h2 { margin: 0; font-size: 20px; }
-        .pos-screen p { margin: 8px 0 0 0; font-size: 15px; }
-        
-        .radar-pulse {
-            width: 12px; height: 12px; background: #fbbc05; border-radius: 50%;
-            box-shadow: 0 0 0 0 rgba(251, 188, 5, 0.7);
-            animation: pulse 1.6s infinite;
-            margin-bottom: 10px;
-        }
-        @keyframes pulse {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(251, 188, 5, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 12px rgba(251, 188, 5, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(251, 188, 5, 0); }
-        }
-
-        .history-box {
-            background: #151618;
-            border: 1px solid #333;
-            border-radius: 8px;
-            padding: 10px;
-            max-height: 150px;
-            overflow-y: auto;
-            margin-top: 15px;
-            font-size: 13px;
-        }
-        .history-item {
-            padding: 6px 0;
-            border-bottom: 1px solid #222;
-            display: flex;
             justify-content: space-between;
         }
 
-        .btn { border: none; padding: 12px 20px; border-radius: 8px; font-size: 16px; cursor: pointer; width: 100%; font-weight: bold; }
-        .btn-primary { background-color: var(--primary); color: white; }
-        .btn-success { background-color: #34a853; color: white; margin-top: 10px; }
-        .btn-danger { background-color: #d93025; color: white; margin-top: 10px;}
-        .btn-nfc { background-color: #fbbc05; color: #202124; margin-bottom: 10px; }
-        .btn-camera { background-color: #9334e6; color: white; margin-bottom: 10px; }
-        .btn-gpay { background-color: #000; color: #fff; border: 1px solid #555; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; }
-
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: white;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-around;
-            padding: 12px 0;
-            z-index: 100;
+        .card:hover {
+            transform: translateY(-8px);
+            border-color: var(--accent);
+            box-shadow: 0 15px 35px rgba(0, 255, 204, 0.15);
         }
-        .nav-item {
-            text-align: center;
-            cursor: pointer;
-            color: var(--text-light);
+
+        .card-icon {
+            font-size: 45px;
+            margin-bottom: 15px;
+        }
+
+        .card h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .card p {
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .btn {
+            display: inline-block;
+            background: transparent;
+            color: var(--text-main);
+            border: 2px solid var(--accent);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease-in-out;
             font-size: 14px;
-            flex: 1;
         }
-        .nav-item.active { color: var(--primary); font-weight: bold; }
-        .nav-icon { font-size: 20px; margin-bottom: 2px; display: block; }
 
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); justify-content: center; align-items: center; }
-        .modal-content { background: white; padding: 25px; border-radius: 20px; text-align: center; max-width: 300px; width: 85%; }
-        #barcodeElement { max-width: 100%; height: auto; }
-        
-        .preview-thumb { width: 100%; height: 80px; object-fit: cover; border-radius: 8px; margin-top: 5px; display: none; }
+        .btn:hover {
+            background: var(--accent);
+            color: #0b0f19;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.5);
+        }
+
+        /* Specific button branding colors */
+        .btn-discord:hover { background: #5865F2; border-color: #5865F2; color: white; box-shadow: 0 0 15px rgba(88, 101, 242, 0.5); }
+        .btn-roblox:hover { background: #e32636; border-color: #e32636; color: white; box-shadow: 0 0 15px rgba(227, 38, 54, 0.5); }
+        .btn-youtube:hover { background: #FF0000; border-color: #FF0000; color: white; box-shadow: 0 0 15px rgba(255, 0, 0, 0.5); }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-muted);
+            font-size: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            width: 100%;
+        }
     </style>
 </head>
 <body>
 
-<header>
-    <h1>My Wallet & POS</h1>
-    <span style="font-size: 22px;">💳</span>
-</header>
+    <div class="glow-sphere"></div>
 
-<!-- SCREEN 1: ΠΟΡΤΟΦΟΛΙ -->
-<div id="walletScreen" class="screen active-screen">
-    <div class="add-section" id="addForm" style="display:none;">
-        <h3>➕ Νέα Κάρτα Πόντων</h3>
-        <div class="form-group">
-            <label>Όνομα Καταστήματος:</label>
-            <input type="text" id="storeName" class="form-control" placeholder="π.χ. Super Market">
-        </div>
-        <div class="form-group">
-            <label>Αριθμός Κάρτας:</label>
-            <input type="text" id="cardNumber" class="form-control" placeholder="123456789">
-        </div>
+    <header>
+        <div class="logo-badge">Roblox Development Group</div>
+        <h1>4PCTEAM</h1>
+        <p class="subtitle">Δημιουργούμε μοναδικές εμπειρίες, παιχνίδια και κοινότητες στο Roblox.</p>
+    </header>
 
-        <input type="file" id="scanInput" accept="image/*" capture="environment" style="display:none;" onchange="scanCodeFromImage(event)">
-        <button class="btn btn-camera" onclick="document.getElementById('scanInput').click()">📷 Σάρωση Barcode / QR Code</button>
-
-        <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;" onchange="handlePhoto(event)">
-        <button class="btn" style="background-color: #3f51b5; color: white; margin-bottom: 10px;" onclick="document.getElementById('cameraInput').click()">🖼️ Φωτογραφία Φόντου Κάρτας</button>
-        <img id="photoPreview" class="preview-thumb">
-        
-        <button class="btn btn-nfc" onclick="scanNFC()">📡 Σάρωση NFC Κάρτας</button>
-        
-        <p id="statusMessage" style="font-size: 12px; color: #666; text-align: center; margin-top: -5px; margin-bottom: 15px;"></p>
-
-        <div class="form-group">
-            <label>Χρώμα:</label>
-            <div class="color-picker" id="colorPicker">
-                <div class="color-dot active" style="background: linear-gradient(135deg, #4285f4, #34a853);" data-color="linear-gradient(135deg, #4285f4, #34a853)"></div>
-                <div class="color-dot" style="background: linear-gradient(135deg, #ff6b6b, #f06595);" data-color="linear-gradient(135deg, #ff6b6b, #f06595)"></div>
-                <div class="color-dot" style="background: linear-gradient(135deg, #f1c40f, #f39c12);" data-color="linear-gradient(135deg, #f1c40f, #f39c12)"></div>
-                <div class="color-dot" style="background: linear-gradient(135deg, #2c3e50, #34495e);" data-color="linear-gradient(135deg, #2c3e50, #34495e)"></div>
+    <div class="container">
+        <!-- Discord Card -->
+        <div class="card">
+            <div>
+                <div class="card-icon">💬</div>
+                <h3>Discord Community</h3>
+                <p>Μπες στην κοινότητά μας για να μιλήσεις με άλλους developers, να δεις τα updates και να παίξουμε μαζί!</p>
             </div>
+            <a href="https://discord.gg/DEsPSh43q3" target="_blank" class="btn btn-discord">Join Discord</a>
         </div>
-        <button class="btn btn-primary" onclick="addCard()">Αποθήκευση</button>
-        <button class="btn btn-danger" onclick="toggleAddForm()">Ακύρωση</button>
-    </div>
 
-    <div id="cardsList"></div>
-    <button class="btn btn-primary" onclick="toggleAddForm()" id="addBtn" style="margin-top: 10px;">Προσθήκη Νέας Κάρτας</button>
-</div>
-
-<!-- SCREEN 2: POS -->
-<div id="posScreen" class="screen">
-    <div class="pos-terminal">
-        <div class="pos-header">
-            <h3 style="margin:0;">ΤΕΡΜΑΤΙΚΟ POS</h3>
-            <div class="live-badge">
-                <div class="live-dot"></div> LIVE LISTENING
+        <!-- Roblox Group Card -->
+        <div class="card">
+            <div>
+                <div class="card-icon">🎮</div>
+                <h3>Roblox Group</h3>
+                <p>Γίνε μέλος στο επίσημο group μας στο Roblox (Bill Skaf Studios) για να στηρίξεις τα παιχνίδια μας!</p>
             </div>
+            <a href="https://www.roblox.com/communities/612987225/Bill-Skaf-Studios" target="_blank" class="btn btn-roblox">Visit Group</a>
         </div>
 
-        <div class="pos-screen" id="posDisplay">
-            <div class="radar-pulse"></div>
-            <h2>ΑΝΑΜΟΝΗ ΣΗΜΑΤΟΣ...</h2>
-            <p>Φέρτε την κάρτα κοντά στο POS</p>
-        </div>
-
-        <label style="font-weight: bold; display: block; margin-bottom: 5px; color: #fff; font-size: 13px;">Ιστορικό Τελευταίων Σαρώσεων:</label>
-        <div class="history-box" id="scanHistoryList">
-            <div style="color: #666; text-align: center;">Καμία σάρωση ακόμα</div>
-        </div>
-        
-        <div class="add-section" style="margin-top: 15px; background: #2a2b2e; padding: 15px; border-radius: 8px;">
-            <label style="font-weight: bold; display: block; margin-bottom: 5px; color: #fff; font-size: 14px;">Προσομοίωση Σήματος:</label>
-            <select id="cardSelectorForPos" class="form-control" style="background: #111; color: #fff; border: 1px solid #444;"></select>
-            <button class="btn btn-success" style="margin-top: 10px;" onclick="simulateExternalScan('barcode')">📡 Προσομοίωση Σήματος Barcode</button>
-            <button class="btn btn-gpay" onclick="simulateExternalScan('gpay')">
-                <span style="font-size: 18px;">G</span> Προσομοίωση Google Pay (NFC)
-            </button>
+        <!-- YouTube Channel Card -->
+        <div class="card">
+            <div>
+                <div class="card-icon">📺</div>
+                <h3>YouTube Channel</h3>
+                <p>Δες τα βίντεο, τα tutorials ανάπτυξης παιχνιδιών και τα trailers από τα νέα μας projects στο κανάλι μας.</p>
+            </div>
+            <a href="https://www.youtube.com/@4PCTEAM" target="_blank" class="btn btn-youtube">Watch YouTube</a>
         </div>
     </div>
-</div>
 
-<!-- NAVIGATION -->
-<div class="bottom-nav">
-    <div class="nav-item active" onclick="switchScreen('wallet', event)">
-        <span class="nav-icon">💳</span>
-        Πορτοφόλι
-    </div>
-    <div class="nav-item" onclick="switchScreen('pos', event)">
-        <span class="nav-icon">💰</span>
-        POS
-    </div>
-</div>
-
-<!-- MODAL BARCODE -->
-<div id="barcodeModal" class="modal" onclick="closeModal()">
-    <div class="modal-content" onclick="event.stopPropagation()">
-        <h3 id="modalTitle">Κάρτα</h3>
-        <svg id="barcodeElement"></svg>
-        <p id="modalNumber" style="font-weight: bold; margin-top: 10px;"></p>
-        <button class="btn btn-danger" style="margin-top: 10px; padding: 8px;" onclick="closeModal()">Κλείσιμο</button>
-    </div>
-</div>
-
-<script>
-    let cards = JSON.parse(localStorage.getItem('myCardsPro')) || [];
-    let scanHistory = JSON.parse(localStorage.getItem('posScanHistory')) || [];
-    let selectedColor = "linear-gradient(135deg, #4285f4, #34a853)";
-    let capturedPhotoData = "";
-
-    // Web Audio API για ήχο Beep (χωρίς αρχεία)
-    function playBeep() {
-        try {
-            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-            
-            oscillator.type = 'sine';
-            oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // Συχνότητα Μπιπ
-            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            
-            oscillator.start();
-            oscillator.stop(audioCtx.currentTime + 0.15); // Διάρκεια 0.15 δευτερόλεπτα
-        } catch(e) {}
-    }
-
-    // Δόνηση κινητού
-    function triggerVibration() {
-        if ("vibrate" in navigator) {
-            navigator.vibrate(100); // Δόνηση 100 χιλιοστών του δευτερολέπτου
-        }
-    }
-
-    const colorDots = document.querySelectorAll('.color-dot');
-    colorDots.forEach(dot => {
-        dot.addEventListener('click', () => {
-            document.querySelector('.color-dot.active').classList.remove('active');
-            dot.classList.add('active');
-            selectedColor = dot.getAttribute('data-color');
-            capturedPhotoData = "";
-            document.getElementById('photoPreview').style.display = 'none';
-        });
-    });
-
-    function toggleAddForm() {
-        const form = document.getElementById('addForm');
-        const btn = document.getElementById('addBtn');
-        if (form.style.display === 'none') {
-            form.style.display = 'block';
-            btn.style.display = 'none';
-        } else {
-            form.style.display = 'none';
-            btn.style.display = 'block';
-            capturedPhotoData = "";
-            document.getElementById('photoPreview').style.display = 'none';
-        }
-    }
-
-    async function scanCodeFromImage(event) {
-        const file = event.target.files[0];
-        const statusP = document.getElementById('statusMessage');
-        if (!file) return;
-
-        if (!('BarcodeDetector' in window)) {
-            statusP.innerText = "Η συσκευή σου δεν υποστηρίζει αυτόματο barcode scanner.";
-            return;
-        }
-
-        statusP.innerText = "Αναζήτηση Barcode / QR... ⏳";
-        try {
-            const imageBitmap = await createImageBitmap(file);
-            const barcodeDetector = new BarcodeDetector({ formats: ['code_128', 'ean_13', 'ean_8', 'qr_code', 'upc_a', 'code_39'] });
-            const results = await barcodeDetector.detect(imageBitmap);
-
-            if (results.length > 0) {
-                let foundCode = results[0].rawValue;
-                document.getElementById('cardNumber').value = foundCode;
-                statusP.innerText = "Το Barcode/QR διαβάστηκε επιτυχώς! ✅";
-                playBeep();
-                triggerVibration();
-                broadcastToPOS('barcode', { name: "Σαρωμένη Κάρτα", number: foundCode });
-            } else {
-                statusP.innerText = "Δεν βρέθηκε κωδικός.";
-            }
-        } catch (err) {
-            statusP.innerText = "Σφάλμα σάρωσης κωδικού.";
-        }
-    }
-
-    function handlePhoto(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            capturedPhotoData = e.target.result;
-            const preview = document.getElementById('photoPreview');
-            preview.src = capturedPhotoData;
-            preview.style.display = 'block';
-            document.getElementById('statusMessage').innerText = "Η φωτογραφία φόντου προστέθηκε! ✅";
-        };
-        reader.readAsDataURL(file);
-    }
-
-    function addCard() {
-        const name = document.getElementById('storeName').value.trim();
-        const number = document.getElementById('cardNumber').value.trim();
-
-        if (name === '' || number === '') {
-            alert('Συμπλήρωσε όνομα και αριθμό κάρτας!');
-            return;
-        }
-
-        let cardBackground = selectedColor;
-        if (capturedPhotoData) {
-            cardBackground = `url('${capturedPhotoData}')`;
-        }
-
-        cards.push({ name, number, color: cardBackground });
-        localStorage.setItem('myCardsPro', JSON.stringify(cards));
-
-        document.getElementById('storeName').value = '';
-        document.getElementById('cardNumber').value = '';
-        document.getElementById('statusMessage').innerText = '';
-        capturedPhotoData = "";
-        document.getElementById('photoPreview').style.display = 'none';
-        toggleAddForm();
-        renderCards();
-    }
-
-    function deleteCard(index, event) {
-        event.stopPropagation(); // Να μην ανοίξει το barcode όταν πατιέται η διαγραφή
-        if (confirm("Θέλεις σίγουρα να διαγράψεις αυτή την κάρτα;")) {
-            cards.splice(index, 1);
-            localStorage.setItem('myCardsPro', JSON.stringify(cards));
-            renderCards();
-        }
-    }
-
-    async function scanNFC() {
-        const statusP = document.getElementById('statusMessage');
-        if (!('NDEFReader' in window)) {
-            statusP.innerText = "Το NFC δεν υποστηρίζεται σε αυτή τη συσκευή.";
-            return;
-        }
-
-        try {
-            statusP.innerText = "Φέρτε την κάρτα κοντά στο πίσω μέρος...";
-            const ndef = new NDEFReader();
-            await ndef.scan();
-
-            ndef.onreading = event => {
-                const decoder = new TextDecoder();
-                for (const record of event.record.records || [event]) {
-                    if (record.data) {
-                        const text = decoder.decode(record.data);
-                        document.getElementById('cardNumber').value = text;
-                        statusP.innerText = "Διαβάστηκε επιτυχώς με NFC! ✅";
-                        playBeep();
-                        triggerVibration();
-                        broadcastToPOS('gpay', { name: "NFC Κάρτα", number: text });
-                        break;
-                    }
-                }
-            };
-        } catch (error) {
-            statusP.innerText = "Σφάλμα NFC: " + error;
-        }
-    }
-
-    function renderCards() {
-        const listDiv = document.getElementById('cardsList');
-        const selectBox = document.getElementById('cardSelectorForPos');
-        
-        listDiv.innerHTML = '';
-        selectBox.innerHTML = '';
-
-        if (cards.length === 0) {
-            listDiv.innerHTML = '<p style="text-align:center; color:#666; margin-top:30px;">Δεν υπάρχουν κάρτες ακόμα. Πρόσθεσε την πρώτη σου!</p>';
-        }
-
-        cards.forEach((card, index) => {
-            let bgStyle = card.color.startsWith('url') ? `background: ${card.color}` : `background: ${card.color}`;
-            
-            listDiv.innerHTML += `
-                <div class="wallet-card" style="${bgStyle}" onclick="showBarcode('${card.name}', '${card.number}')">
-                    <button class="delete-card-btn" onclick="deleteCard(${index}, event)" title="Διαγραφή">✕</button>
-                    <h3>${card.name}</h3>
-                    <div class="card-number">${card.number}</div>
-                </div>
-            `;
-
-            selectBox.innerHTML += `<option value="${index}">${card.name} (${card.number})</option>`;
-        });
-        
-        renderHistory();
-    }
-
-    function switchScreen(screenName, event) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-
-        if (screenName === 'wallet') {
-            document.getElementById('walletScreen').classList.add('active-screen');
-            event.currentTarget.classList.add('active');
-        } else {
-            document.getElementById('posScreen').classList.add('active-screen');
-            event.currentTarget.classList.add('active');
-        }
-    }
-
-    function showBarcode(name, number) {
-        document.getElementById('modalTitle').innerText = name;
-        document.getElementById('modalNumber').innerText = number;
-        document.getElementById('barcodeModal').style.display = 'flex';
-        
-        try {
-            JsBarcode("#barcodeElement", number, {
-                format: "CODE128",
-                lineColor: "#000",
-                width: 2,
-                height: 70,
-                displayValue: false
-            });
-        } catch(e) {}
-    }
-
-    function closeModal() {
-        document.getElementById('barcodeModal').style.display = 'none';
-    }
-
-    function broadcastToPOS(type, cardObj) {
-        const timeNow = new Date().toLocaleTimeString('el-GR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-        const payload = { type: type, card: cardObj, time: timeNow, timestamp: Date.now() };
-        localStorage.setItem('pos_live_signal', JSON.stringify(payload));
-        
-        // Προσθήκη στο τοπικό ιστορικό
-        addHistoryItem(payload);
-    }
-
-    function simulateExternalScan(type) {
-        const selectBox = document.getElementById('cardSelectorForPos');
-        if (cards.length === 0) {
-            alert('Πρόσθεσε πρώτα μια κάρτα στο πορτοφόλι!');
-            return;
-        }
-        const chosenCard = cards[selectBox.value];
-        playBeep();
-        triggerVibration();
-        broadcastToPOS(type, chosenCard);
-    }
-
-    window.addEventListener('storage', (event) => {
-        if (event.key === 'pos_live_signal' && event.newValue) {
-            const data = JSON.parse(event.newValue);
-            handleIncomingSignal(data.type, data.card, data.time);
-        }
-    });
-
-    function addHistoryItem(payload) {
-        scanHistory.unshift(payload); // Προσθήκη στην αρχή
-        if (scanHistory.length > 10) scanHistory.pop(); // Κράτησε τις τελευταίες 10
-        localStorage.setItem('posScanHistory', JSON.stringify(scanHistory));
-        renderHistory();
-    }
-
-    function renderHistory() {
-        const historyContainer = document.getElementById('scanHistoryList');
-        if (scanHistory.length === 0) {
-            historyContainer.innerHTML = '<div style="color: #666; text-align: center;">Καμία σάρωση ακόμα</div>';
-            return;
-        }
-
-        historyContainer.innerHTML = '';
-        scanHistory.forEach(item => {
-            historyContainer.innerHTML += `
-                <div class="history-item">
-                    <span><b>${item.card.name}</b> <small style="color:#aaa">(${item.card.number})</small></span>
-                    <span style="color: #fbbc05;">${item.time}</span>
-                </div>
-            `;
-        });
-    }
-
-    function handleIncomingSignal(type, card, time) {
-        playBeep();
-        triggerVibration();
-        const display = document.getElementById('posDisplay');
-
-        if (type === 'barcode') {
-            display.innerHTML = `
-                <div class="radar-pulse" style="background:#34a853;"></div>
-                <h2 style="color: #34a853;">ΑΝΙΧΝΕΥΤΗΚΕ BARCODE! 📷</h2>
-                <p><b>${card.name}</b><br><small>${card.number}</small></p>
-            `;
-        } else {
-            display.innerHTML = `
-                <div class="radar-pulse" style="background:#4285f4;"></div>
-                <h2 style="color: #4285f4;">GOOGLE PAY NFC 📡</h2>
-                <p><b>${card.name}</b><br><small>${card.number}</small></p>
-            `;
-        }
-
-        // Ενημέρωση ιστορικού και τοπικά αν κλήθηκε από άλλη καρτέλα
-        if (!scanHistory.some(s => s.timestamp === card.timestamp)) {
-            addHistoryItem({ type, card, time });
-        }
-
-        setTimeout(() => {
-            display.innerHTML = `
-                <div class="radar-pulse"></div>
-                <h2>ΑΝΑΜΟΝΗ ΣΗΜΑΤΟΣ...</h2>
-                <p>Φέρτε την κάρτα κοντά στο POS</p>
-            `;
-        }, 4000);
-    }
-
-    renderCards();
-</script>
+    <footer>
+        <p>&copy; 2026 4PCTEAM. All Rights Reserved.</p>
+    </footer>
 
 </body>
 </html>
