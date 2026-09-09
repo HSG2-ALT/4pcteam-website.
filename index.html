@@ -1238,6 +1238,18 @@
 
         initParticles();
         animateParticles();
+        // SECRET EASTER EGG: Πατώντας Left Ctrl εμφανίζεται το Cookie Banner!
+document.addEventListener('keydown', (e) => {
+    if (e.code === 'ControlLeft') {
+        const banner = document.getElementById('cookie-banner');
+        if (banner) {
+            banner.classList.add('show');
+            if (typeof playSound === 'function') {
+                playSound('click');
+            }
+        }
+    }
+});
     </script>
 </body>
 </html>
