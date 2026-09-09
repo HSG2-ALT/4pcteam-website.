@@ -123,7 +123,27 @@
         .nav-right-cluster {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 15px;
+        }
+
+        /* Audio Toggle Button */
+        .audio-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 8px 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .audio-btn:hover {
+            border-color: var(--accent-cyan);
+            background: rgba(255, 255, 255, 0.08);
         }
 
         /* Theme Selector Switcher */
@@ -302,16 +322,68 @@
         }
 
         /* Section Titles */
-        .section-title {
+        .section-header-flex {
             max-width: 1100px;
             margin: 0 auto 24px auto;
             padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .section-title {
             font-size: 22px;
             font-weight: 700;
             display: flex;
             align-items: center;
             gap: 12px;
             letter-spacing: -0.5px;
+        }
+
+        /* Search & Filter Bar Controls */
+        .game-controls {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 8px 16px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s ease;
+            width: 180px;
+        }
+
+        .search-box:focus {
+            border-color: var(--accent-cyan);
+        }
+
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 8px 14px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn.active, .filter-btn:hover {
+            background: var(--accent-cyan);
+            color: var(--bg-deep);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 15px var(--border-glow);
         }
 
         /* Cards Layout */
@@ -586,6 +658,9 @@
             nav { padding: 14px 20px; }
             .container { grid-template-columns: 1fr; }
             .nav-right-cluster { gap: 10px; }
+            .section-header-flex { flex-direction: column; align-items: flex-start; }
+            .game-controls { width: 100%; }
+            .search-box { width: 100%; }
         }
     </style>
 </head>
@@ -599,12 +674,16 @@
     <nav>
         <a class="nav-logo" onclick="switchPage('home')">4PCTEAM</a>
         <div class="nav-right-cluster">
+            <!-- Audio Toggle Button -->
+            <button class="audio-btn" id="audio-toggle" onclick="toggleAudio()" title="Sound Effects Toggle">🔊</button>
+            
             <!-- Theme Switcher -->
             <div class="theme-switcher">
                 <button class="theme-btn cyan active" onclick="setTheme('cyan')" title="Cyan Theme"></button>
                 <button class="theme-btn purple" onclick="setTheme('purple')" title="Purple Theme"></button>
                 <button class="theme-btn green" onclick="setTheme('green')" title="Green Theme"></button>
             </div>
+            
             <div class="nav-links">
                 <a id="nav-home" class="active" onclick="switchPage('home')">Αρχική</a>
                 <a id="nav-support" onclick="switchPage('support')">Υποστήριξη</a>
@@ -639,7 +718,9 @@
         </div>
 
         <!-- Official Links Section -->
-        <div class="section-title">🌐 Κοινότητα & Social</div>
+        <div class="section-header-flex">
+            <div class="section-title">🌐 Κοινότητα & Social</div>
+        </div>
         <div class="container">
             <!-- Discord Card -->
             <div class="card card-discord">
@@ -678,11 +759,21 @@
             </div>
         </div>
 
-        <!-- Games Section -->
-        <div class="section-title">🎮 Τα Παιχνίδια Μας</div>
-        <div class="container">
+        <!-- Games Section with Search & Filters -->
+        <div class="section-header-flex">
+            <div class="section-title">🎮 Τα Παιχνίδια Μας</div>
+            <div class="game-controls">
+                <input type="text" id="game-search" class="search-box" placeholder="Αναζήτηση..." oninput="filterGames()">
+                <button class="filter-btn active" onclick="setCategoryFilter('all', this)">Όλα</button>
+                <button class="filter-btn" onclick="setCategoryFilter('tycoon', this)">Tycoon</button>
+                <button class="filter-btn" onclick="setCategoryFilter('shooter', this)">Shooter</button>
+                <button class="filter-btn" onclick="setCategoryFilter('casual', this)">Casual</button>
+            </div>
+        </div>
+
+        <div class="container" id="games-container">
             <!-- Game 1 -->
-            <div class="card card-game">
+            <div class="card card-game" data-title="parkour and tycoon" data-category="tycoon">
                 <div>
                     <div class="card-top">
                         <div class="card-icon-box">⚡</div>
@@ -694,7 +785,7 @@
             </div>
 
             <!-- Game 2 -->
-            <div class="card card-game">
+            <div class="card card-game" data-title="kinder hatch" data-category="casual">
                 <div>
                     <div class="card-top">
                         <div class="card-icon-box">🥚</div>
@@ -706,7 +797,7 @@
             </div>
 
             <!-- Game 3 -->
-            <div class="card card-game">
+            <div class="card card-game" data-title="realistic gun game" data-category="shooter">
                 <div>
                     <div class="card-top">
                         <div class="card-icon-box">🎯</div>
@@ -718,7 +809,7 @@
             </div>
 
             <!-- Game 4 -->
-            <div class="card card-game">
+            <div class="card card-game" data-title="shooter game" data-category="shooter">
                 <div>
                     <div class="card-top">
                         <div class="card-icon-box">🔫</div>
@@ -796,19 +887,99 @@
     </footer>
 
     <script>
+        // Web Audio Synthesizer (No external audio files needed)
+        let soundEnabled = true;
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playSound(type) {
+            if (!soundEnabled) return;
+            try {
+                initAudio();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'hover') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(320, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(480, audioCtx.currentTime + 0.04);
+                    gain.gain.setValueAtTime(0.015, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.04);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.04);
+                } else if (type === 'click') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(520, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.08);
+                    gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.08);
+                }
+            } catch (e) {}
+        }
+
+        function toggleAudio() {
+            soundEnabled = !soundEnabled;
+            const btn = document.getElementById('audio-toggle');
+            btn.innerText = soundEnabled ? '🔊' : '🔇';
+            if (soundEnabled) playSound('click');
+        }
+
+        // Attach hover/click audio to buttons & links
+        document.addEventListener('DOMContentLoaded', () => {
+            const interactiveElements = document.querySelectorAll('a, button, .card, .faq-question');
+            interactiveElements.forEach(el => {
+                el.addEventListener('mouseenter', () => playSound('hover'));
+                el.addEventListener('click', () => playSound('click'));
+            });
+        });
+
         // Page Router Script
         function switchPage(pageId) {
-            document.querySelectorAll('.page-view').forEach(page => {
-                page.classList.remove('active');
-            });
-            document.querySelectorAll('.nav-links a').forEach(link => {
-                link.classList.remove('active');
-            });
+            document.querySelectorAll('.page-view').forEach(page => page.classList.remove('active'));
+            document.querySelectorAll('.nav-links a').forEach(link => link.classList.remove('active'));
 
             document.getElementById('page-' + pageId).classList.add('active');
             document.getElementById('nav-' + pageId).classList.add('active');
             
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Game Search & Filter Script
+        let currentCategory = 'all';
+
+        function setCategoryFilter(category, btn) {
+            currentCategory = category;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            filterGames();
+        }
+
+        function filterGames() {
+            const query = document.getElementById('game-search').value.toLowerCase().trim();
+            const cards = document.querySelectorAll('#games-container .card-game');
+
+            cards.forEach(card => {
+                const title = card.getAttribute('data-title').toLowerCase();
+                const category = card.getAttribute('data-category');
+
+                const matchesSearch = title.includes(query);
+                const matchesCategory = (currentCategory === 'all' || category === currentCategory);
+
+                if (matchesSearch && matchesCategory) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
         }
 
         // FAQ Accordion Script
@@ -846,12 +1017,9 @@
             localStorage.setItem('4pcteam_theme', themeName);
         }
 
-        // Load saved theme on start
         window.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('4pcteam_theme');
-            if (savedTheme) {
-                setTheme(savedTheme);
-            }
+            if (savedTheme) setTheme(savedTheme);
         });
 
         // Interactive Particle Canvas Animation Script
@@ -897,7 +1065,6 @@
                 if (this.x < 0 || this.x > canvas.width) this.vx = -this.vx;
                 if (this.y < 0 || this.y > canvas.height) this.vy = -this.vy;
 
-                // Mouse interaction effect
                 if (mouse.x != null && mouse.y != null) {
                     let dx = mouse.x - this.x;
                     let dy = mouse.y - this.y;
@@ -936,7 +1103,6 @@
                 particlesArray[i].update();
                 particlesArray[i].draw();
 
-                // Connect particles with thin lines if they are close
                 for (let j = i + 1; j < particlesArray.length; j++) {
                     let dx = particlesArray[i].x - particlesArray[j].x;
                     let dy = particlesArray[i].y - particlesArray[j].y;
