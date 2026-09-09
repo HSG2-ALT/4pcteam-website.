@@ -559,7 +559,7 @@
         }
 
         .faq-item.active .faq-answer {
-            max-height: 150px;
+            max-height: 200px;
             opacity: 1;
             margin-top: 12px;
         }
@@ -640,6 +640,83 @@
             box-shadow: 0 0 25px rgba(0, 255, 204, 0.1);
         }
 
+        /* Cookie Banner Floating Bar */
+        .cookie-banner {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(120%);
+            width: calc(100% - 40px);
+            max-width: 650px;
+            background: rgba(13, 18, 29, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glow);
+            border-radius: 20px;
+            padding: 20px 24px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .cookie-banner.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .cookie-text {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .cookie-text strong {
+            color: #fff;
+        }
+
+        .cookie-btns {
+            display: flex;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .cookie-btn-accept {
+            background: var(--accent-cyan);
+            color: var(--bg-deep);
+            border: none;
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .cookie-btn-accept:hover {
+            opacity: 0.9;
+            box-shadow: 0 0 15px var(--border-glow);
+        }
+
+        .cookie-btn-decline {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .cookie-btn-decline:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
         /* Footer */
         footer {
             text-align: center;
@@ -661,6 +738,8 @@
             .section-header-flex { flex-direction: column; align-items: flex-start; }
             .game-controls { width: 100%; }
             .search-box { width: 100%; }
+            .cookie-banner { flex-direction: column; text-align: center; }
+            .cookie-btns { width: 100%; justify-content: center; }
         }
     </style>
 </head>
@@ -845,6 +924,12 @@
                     <div class="faq-answer">Μπορείς να συμπληρώσεις την παρακάτω φόρμα υποστήριξης ή να ανοίξεις ticket στο Discord κανάλι μας.</div>
                 </div>
 
+                <!-- Νέα Ερώτηση για τα Cookies -->
+                <div class="faq-item">
+                    <div class="faq-question">Χρησιμοποιεί η ιστοσελίδα cookies; <span>+</span></div>
+                    <div class="faq-answer">Χρησιμοποιούμε μόνο βασικά και απαραίτητα cookies (τοπική αποθήκευση LocalStorage) για να αποθηκεύουμε τις προτιμήσεις σου, όπως το επιλεγμένο θέμα εμφάνισης (Theme) και τις ρυθμίσεις ήχου. Δεν συλλέγουμε ούτε κοινοποιούμε προσωπικά δεδομένα.</div>
+                </div>
+
                 <div class="faq-item">
                     <div class="faq-question">Πότε θα βγουν νέα updates στα παιχνίδια; <span>+</span></div>
                     <div class="faq-answer">Όλα τα νέα announcements και τα patch notes ανακοινώνονται πρώτα στο Discord και στο YouTube κανάλι μας!</div>
@@ -882,12 +967,23 @@
         </div>
     </div>
 
+    <!-- Floating Cookie Banner -->
+    <div id="cookie-banner" class="cookie-banner">
+        <div class="cookie-text">
+            <strong>🍪 Χρήση Cookies:</strong> Χρησιμοποιούμε βασικά cookies/local storage για να θυμόμαστε τις προτιμήσεις σου (θέμα & ήχος) για καλύτερη εμπειρία περιήγησης.
+        </div>
+        <div class="cookie-btns">
+            <button class="cookie-btn-accept" onclick="acceptCookies()">Αποδοχή</button>
+            <button class="cookie-btn-decline" onclick="declineCookies()">Απόρριψη</button>
+        </div>
+    </div>
+
     <footer>
         <p>&copy; 2026 4PCTEAM & Bill Skaf Studios. All Rights Reserved.</p>
     </footer>
 
     <script>
-        // Web Audio Synthesizer (No external audio files needed)
+        // Web Audio Synthesizer
         let soundEnabled = true;
         let audioCtx = null;
 
@@ -933,7 +1029,6 @@
             if (soundEnabled) playSound('click');
         }
 
-        // Attach hover/click audio to buttons & links
         document.addEventListener('DOMContentLoaded', () => {
             const interactiveElements = document.querySelectorAll('a, button, .card, .faq-question');
             interactiveElements.forEach(el => {
@@ -1017,9 +1112,27 @@
             localStorage.setItem('4pcteam_theme', themeName);
         }
 
+        // Cookie Consent Banner Logic
+        function acceptCookies() {
+            localStorage.setItem('4pcteam_cookies', 'accepted');
+            document.getElementById('cookie-banner').classList.remove('show');
+        }
+
+        function declineCookies() {
+            localStorage.setItem('4pcteam_cookies', 'declined');
+            document.getElementById('cookie-banner').classList.remove('show');
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('4pcteam_theme');
             if (savedTheme) setTheme(savedTheme);
+
+            const cookieConsent = localStorage.getItem('4pcteam_cookies');
+            if (!cookieConsent) {
+                setTimeout(() => {
+                    document.getElementById('cookie-banner').classList.add('show');
+                }, 1000);
+            }
         });
 
         // Interactive Particle Canvas Animation Script
