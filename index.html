@@ -429,6 +429,12 @@
             box-shadow: 0 25px 50px rgba(0, 255, 204, 0.08), 0 0 30px rgba(0, 0, 0, 0.6);
         }
 
+        .card-team:hover {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 10px 30px rgba(0, 255, 204, 0.15);
+            transform: translateY(-6px);
+        }
+
         .card-top {
             display: flex;
             align-items: center;
@@ -899,6 +905,61 @@
                 <a href="https://www.roblox.com/games/92412466953609/SHOOTER-GAME" target="_blank" class="btn">Play on Roblox</a>
             </div>
         </div>
+
+        <!-- Team Section -->
+        <div class="section-header-flex" style="margin-top: 50px;">
+            <div class="section-title">👥 Η Ομάδα Μας (Our Team)</div>
+        </div>
+
+        <div class="container" id="team-container">
+            <!-- Βασίλης -->
+            <div class="card card-team">
+                <div>
+                    <div class="card-top">
+                        <div class="card-icon-box">👨‍💻</div>
+                    </div>
+                    <h3>Βασίλης</h3>
+                    <p style="color: var(--accent-cyan); font-weight: 700; margin-bottom: 8px;">Lead Developer & Founder</p>
+                    <p>Υπεύθυνος για τον προγραμματισμό (scripting), την κατασκευή των παιχνιδιών και την ανάπτυξη του website.</p>
+                </div>
+            </div>
+
+            <!-- Γιώργος -->
+            <div class="card card-team">
+                <div>
+                    <div class="card-top">
+                        <div class="card-icon-box">🛠️</div>
+                    </div>
+                    <h3>Γιώργος</h3>
+                    <p style="color: var(--accent-cyan); font-weight: 700; margin-bottom: 8px;">Developer & Builder</p>
+                    <p>Σχεδιασμός χαρτών, 3D modeling και δημιουργία των κόσμων στα Roblox projects της ομάδας.</p>
+                </div>
+            </div>
+
+            <!-- Σοφία -->
+            <div class="card card-team">
+                <div>
+                    <div class="card-top">
+                        <div class="card-icon-box">🎨</div>
+                    </div>
+                    <h3>Σοφία</h3>
+                    <p style="color: var(--accent-cyan); font-weight: 700; margin-bottom: 8px;">UI / UX & Graphic Designer</p>
+                    <p>Σχεδιασμός των μενού, γραφικών, thumbnails και εικαστικών για τα παιχνίδια και τα social media.</p>
+                </div>
+            </div>
+
+            <!-- Νικόλας -->
+            <div class="card card-team">
+                <div>
+                    <div class="card-top">
+                        <div class="card-icon-box">⚡</div>
+                    </div>
+                    <h3>Νικόλας</h3>
+                    <p style="color: var(--accent-cyan); font-weight: 700; margin-bottom: 8px;">Game Tester & Community Manager</p>
+                    <p>Δοκιμές παιχνιδιών (testing), εύρεση bugs και διαχείριση της κοινότητας στο Discord.</p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- SUPPORT PAGE VIEW -->
@@ -924,7 +985,7 @@
                     <div class="faq-answer">Μπορείς να συμπληρώσεις την παρακάτω φόρμα υποστήριξης ή να ανοίξεις ticket στο Discord κανάλι μας.</div>
                 </div>
 
-                <!-- Νέα Ερώτηση για τα Cookies -->
+                <!-- Ερώτηση για τα Cookies -->
                 <div class="faq-item">
                     <div class="faq-question">Χρησιμοποιεί η ιστοσελίδα cookies; <span>+</span></div>
                     <div class="faq-answer">Χρησιμοποιούμε μόνο βασικά και απαραίτητα cookies (τοπική αποθήκευση LocalStorage) για να αποθηκεύουμε τις προτιμήσεις σου, όπως το επιλεγμένο θέμα εμφάνισης (Theme) και τις ρυθμίσεις ήχου. Δεν συλλέγουμε ούτε κοινοποιούμε προσωπικά δεδομένα.</div>
@@ -1112,7 +1173,7 @@
             localStorage.setItem('4pcteam_theme', themeName);
         }
 
-        // Cookie Consent Banner Logic
+        // Cookie Consent Logic
         function acceptCookies() {
             localStorage.setItem('4pcteam_cookies', 'accepted');
             document.getElementById('cookie-banner').classList.remove('show');
@@ -1238,18 +1299,19 @@
 
         initParticles();
         animateParticles();
+
         // SECRET EASTER EGG: Πατώντας Left Ctrl εμφανίζεται το Cookie Banner!
-document.addEventListener('keydown', (e) => {
-    if (e.code === 'ControlLeft') {
-        const banner = document.getElementById('cookie-banner');
-        if (banner) {
-            banner.classList.add('show');
-            if (typeof playSound === 'function') {
-                playSound('click');
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'ControlLeft') {
+                const banner = document.getElementById('cookie-banner');
+                if (banner) {
+                    banner.classList.add('show');
+                    if (typeof playSound === 'function') {
+                        playSound('click');
+                    }
+                }
             }
-        }
-    }
-});
+        });
     </script>
 </body>
 </html>
