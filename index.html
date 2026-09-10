@@ -49,6 +49,22 @@
             position: relative;
         }
 
+        /* Announcement Bar */
+        .announcement-bar {
+            background: linear-gradient(90deg, rgba(0,255,204,0.15) 0%, rgba(157,78,221,0.15) 100%);
+            border-bottom: 1px solid var(--border-glow);
+            color: #fff;
+            padding: 10px 20px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            z-index: 1001;
+        }
+
         /* Interactive Canvas Particle Background */
         #particle-canvas {
             position: fixed;
@@ -222,7 +238,7 @@
         /* Hero Section */
         header {
             text-align: center;
-            padding: 80px 20px 40px 20px;
+            padding: 60px 20px 40px 20px;
             position: relative;
         }
 
@@ -384,6 +400,22 @@
             color: var(--bg-deep);
             border-color: var(--accent-cyan);
             box-shadow: 0 0 15px var(--border-glow);
+        }
+
+        .random-game-btn {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            color: #000;
+            font-weight: 800;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .random-game-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px var(--border-glow);
         }
 
         /* Cards Layout */
@@ -751,6 +783,11 @@
 </head>
 <body>
 
+    <!-- Dynamic Announcement Bar -->
+    <div class="announcement-bar" id="announcement-bar">
+        <span id="announcement-text">🔥 Καλωσήρθατε στο επίσημο site του 4PCTEAM! Τσεκάρετε τα νέα μας παιχνίδια στο Roblox!</span>
+    </div>
+
     <!-- Interactive Particle Background Canvas -->
     <canvas id="particle-canvas"></canvas>
     <div class="ambient-glow"></div>
@@ -762,7 +799,7 @@
             <!-- Audio Toggle Button -->
             <button class="audio-btn" id="audio-toggle" onclick="toggleAudio()" title="Sound Effects Toggle">🔊</button>
             
-            <!-- Theme Switcher -->
+            <!-- Theme Selector Switcher -->
             <div class="theme-switcher">
                 <button class="theme-btn cyan active" onclick="setTheme('cyan')" title="Cyan Theme"></button>
                 <button class="theme-btn purple" onclick="setTheme('purple')" title="Purple Theme"></button>
@@ -844,7 +881,7 @@
             </div>
         </div>
 
-        <!-- Games Section with Search & Filters -->
+        <!-- Games Section with Search, Filters & Random Picker -->
         <div class="section-header-flex">
             <div class="section-title">🎮 Τα Παιχνίδια Μας</div>
             <div class="game-controls">
@@ -853,6 +890,7 @@
                 <button class="filter-btn" onclick="setCategoryFilter('tycoon', this)">Tycoon</button>
                 <button class="filter-btn" onclick="setCategoryFilter('shooter', this)">Shooter</button>
                 <button class="filter-btn" onclick="setCategoryFilter('casual', this)">Casual</button>
+                <button class="random-game-btn" onclick="pickRandomGame()">🎲 Τυχαίο Παιχνίδι!</button>
             </div>
         </div>
 
@@ -1098,6 +1136,15 @@
             });
         });
 
+        // Load Announcement from Admin Panel
+        function loadAnnouncement() {
+            const saved = localStorage.getItem('4pcteam_announcement');
+            if (saved) {
+                document.getElementById('announcement-text').innerText = saved;
+            }
+        }
+        window.addEventListener('DOMContentLoaded', loadAnnouncement);
+
         // Page Router Script
         function switchPage(pageId) {
             document.querySelectorAll('.page-view').forEach(page => page.classList.remove('active'));
@@ -1136,6 +1183,21 @@
                     card.style.display = 'none';
                 }
             });
+        }
+
+        // Random Game Picker Logic
+        function pickRandomGame() {
+            const games = [
+                { name: 'Parkour and Tycoon', url: 'https://www.roblox.com/games/111545675146001/Parkour-and-Tycoon' },
+                { name: 'Kinder Hatch', url: 'https://www.roblox.com/games/133304947902903/Kinder-Hatch' },
+                { name: 'Realistic Gun Game', url: 'https://www.roblox.com/games/70779070700175/Realistic-gun-game' },
+                { name: 'SHOOTER GAME', url: 'https://www.roblox.com/games/92412466953609/SHOOTER-GAME' }
+            ];
+
+            const random = games[Math.floor(Math.random() * games.length)];
+            if (confirm('🎲 Το τυχαίο παιχνίδι σου είναι: ' + random.name + '\n\nΘέλεις να μεταφερθείς στο Roblox για να παίξεις;')) {
+                window.open(random.url, '_blank');
+            }
         }
 
         // FAQ Accordion Script
