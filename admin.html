@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4PCTEAM | Admin Control Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #05070a;
+            --bg-card: rgba(16, 23, 38, 0.85);
+            --accent-cyan: #00ffcc;
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-glow: rgba(0, 255, 204, 0.3);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .admin-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(16px);
+        }
+
+        h2 {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #ffffff 30%, var(--accent-cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.sub {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        input, textarea {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 14px 16px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, textarea:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 15px var(--border-glow);
+        }
+
+        textarea { height: 100px; resize: vertical; }
+
+        button {
+            width: 100%;
+            background: var(--accent-cyan);
+            color: var(--bg-deep);
+            border: none;
+            padding: 14px;
+            border-radius: 14px;
+            font-weight: 800;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px var(--border-glow);
+        }
+
+        button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .error-msg {
+            color: #ff4757;
+            font-size: 13px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .success-msg {
+            color: var(--accent-cyan);
+            font-size: 13px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        #panel-content { display: none; }
+    </style>
+</head>
+<body>
+
+    <!-- LOGIN SCREEN -->
+    <div class="admin-box" id="login-box">
+        <h2>🔒 Admin Login</h2>
+        <p class="sub">4PCTEAM Control Panel</p>
+        
+        <form onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label>Κωδικός Πρόσβασης</label>
+                <input type="password" id="pass-input" placeholder="Εισάγετε τον κωδικό..." required>
+            </div>
+            <button type="submit">Είσοδος</button>
+            <div class="error-msg" id="login-error">❌ Λάθος κωδικός πρόσβασης!</div>
+        </form>
+    </div>
+
+    <!-- CONTROL PANEL SCREEN -->
+    <div class="admin-box" id="panel-content">
+        <h2>⚙️ Announcement Manager</h2>
+        <p class="sub">Αλλάξτε την ανακοίνωση στην αρχική σελίδα</p>
+
+        <form onsubmit="saveAnnouncement(event)">
+            <div class="form-group">
+                <label>Κείμενο Ανακοίνωσης</label>
+                <textarea id="announcement-input" placeholder="π.χ. 🔥 NEW UPDATE: Νέα όπλα στο Realistic Gun Game!" required></textarea>
+            </div>
+
+            <button type="submit">Δημοσίευση Ανακοίνωσης</button>
+            <div class="success-msg" id="save-success">✅ Η ανακοίνωση ενημερώθηκε επιτυχώς!</div>
+        </form>
+
+        <button onclick="logout()" style="background: transparent; color: var(--text-muted); border: 1px solid var(--border-color); margin-top: 15px; box-shadow: none;">Αποσύνδεση</button>
+    </div>
+
+    <script>
+        function handleLogin(e) {
+            e.preventDefault();
+            const pass = document.getElementById('pass-input').value;
+            if (pass === 'Bill') {
+                document.getElementById('login-box').style.display = 'none';
+                document.getElementById('panel-content').style.display = 'block';
+                loadCurrentAnnouncement();
+            } else {
+                document.getElementById('login-error').style.display = 'block';
+            }
+        }
+
+        function loadCurrentAnnouncement() {
+            const current = localStorage.getItem('4pcteam_announcement') || '🔥 Καλωσήρθατε στο επίσημο site του 4PCTEAM! Τσεκάρετε τα νέα μας παιχνίδια στο Roblox!';
+            document.getElementById('announcement-input').value = current;
+        }
+
+        function saveAnnouncement(e) {
+            e.preventDefault();
+            const text = document.getElementById('announcement-input').value;
+            localStorage.setItem('4pcteam_announcement', text);
+            
+            const success = document.getElementById('save-success');
+            success.style.display = 'block';
+            setTimeout(() => { success.style.display = 'none'; }, 3000);
+        }
+
+        function logout() {
+            location.reload();
+        }
+    </script>
+</body>
+</html>
