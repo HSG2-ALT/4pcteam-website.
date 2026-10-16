@@ -1,33 +1,38 @@
 <!DOCTYPE html>
-<html lang="el">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>4PCTEAM | Roblox Development Group</title>
+    <title>4PCTEAM | Elite Roblox Development Studio</title>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-deep: #05070a;
-            --bg-surface: #0d121d;
-            --bg-card: rgba(16, 23, 38, 0.75);
+            --bg-deep: #030508;
+            --bg-surface: #0a0f1d;
+            --bg-card: rgba(13, 19, 33, 0.75);
             --accent-cyan: #00ffcc;
             --accent-purple: #9d4edd;
             --accent-blue: #3a86ff;
             --text-main: #ffffff;
             --text-muted: #94a3b8;
             --border-color: rgba(255, 255, 255, 0.08);
-            --border-glow: rgba(0, 255, 204, 0.3);
+            --border-glow: rgba(0, 255, 204, 0.35);
+            --transition-smooth: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
 
         /* Theme Variations */
         body.theme-purple {
             --accent-cyan: #d946ef;
-            --border-glow: rgba(217, 70, 239, 0.3);
+            --border-glow: rgba(217, 70, 239, 0.35);
         }
         body.theme-green {
             --accent-cyan: #22c55e;
-            --border-glow: rgba(34, 197, 94, 0.3);
+            --border-glow: rgba(34, 197, 94, 0.35);
+        }
+        body.theme-gold {
+            --accent-cyan: #f59e0b;
+            --border-glow: rgba(245, 158, 11, 0.35);
         }
 
         * {
@@ -56,14 +61,26 @@
             color: #fff;
             padding: 10px 20px;
             text-align: center;
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 13px;
+            font-weight: 700;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 12px;
             z-index: 1001;
+            letter-spacing: 0.3px;
         }
+
+        .announcement-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 800;
+            transition: color 0.2s ease;
+        }
+        .announcement-close:hover { color: #fff; }
 
         /* Interactive Canvas Particle Background */
         #particle-canvas {
@@ -78,30 +95,23 @@
 
         .ambient-glow {
             position: fixed;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(0, 255, 204, 0.12) 0%, rgba(157, 78, 221, 0.06) 50%, transparent 75%);
-            top: -200px;
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(circle, rgba(0, 255, 204, 0.12) 0%, rgba(157, 78, 221, 0.05) 50%, transparent 75%);
+            top: -250px;
             left: 50%;
             transform: translateX(-50%);
             z-index: -1;
             border-radius: 50%;
             pointer-events: none;
-            filter: blur(80px);
+            filter: blur(90px);
             animation: pulseGlow 8s ease-in-out infinite alternate;
             transition: background 0.5s ease;
         }
 
-        body.theme-purple .ambient-glow {
-            background: radial-gradient(circle, rgba(217, 70, 239, 0.12) 0%, rgba(157, 78, 221, 0.06) 50%, transparent 75%);
-        }
-        body.theme-green .ambient-glow {
-            background: radial-gradient(circle, rgba(34, 197, 94, 0.12) 0%, rgba(16, 185, 129, 0.06) 50%, transparent 75%);
-        }
-
         @keyframes pulseGlow {
-            0% { transform: translateX(-50%) scale(1); opacity: 0.8; }
-            100% { transform: translateX(-50%) scale(1.15); opacity: 1; }
+            0% { transform: translateX(-50%) scale(1); opacity: 0.7; }
+            100% { transform: translateX(-50%) scale(1.2); opacity: 1; }
         }
 
         /* Navigation Bar */
@@ -109,18 +119,19 @@
             position: sticky;
             top: 0;
             z-index: 1000;
-            background: rgba(5, 7, 10, 0.85);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            background: rgba(3, 5, 8, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 16px 40px;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.6);
         }
 
         .nav-logo {
+            font-family: 'JetBrains Mono', monospace;
             font-weight: 800;
             font-size: 22px;
             background: linear-gradient(135deg, #ffffff 30%, var(--accent-cyan) 100%);
@@ -131,46 +142,40 @@
             letter-spacing: -0.5px;
             transition: transform 0.3s ease;
         }
-
-        .nav-logo:hover {
-            transform: scale(1.03);
-        }
+        .nav-logo:hover { transform: scale(1.04); }
 
         .nav-right-cluster {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 16px;
         }
 
-        /* Audio Toggle Button */
-        .audio-btn {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            padding: 8px 12px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s ease;
+        /* Utility Controls */
+        .control-group {
             display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .audio-btn:hover {
-            border-color: var(--accent-cyan);
-            background: rgba(255, 255, 255, 0.08);
-        }
-
-        /* Theme Selector Switcher */
-        .theme-switcher {
-            display: flex;
-            gap: 6px;
+            gap: 8px;
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--border-color);
             padding: 4px;
             border-radius: 12px;
+            align-items: center;
         }
+
+        .icon-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            transition: all 0.2s ease;
+        }
+        .icon-btn:hover { background: rgba(255, 255, 255, 0.08); color: var(--accent-cyan); }
 
         .theme-btn {
             width: 22px;
@@ -180,65 +185,54 @@
             cursor: pointer;
             transition: transform 0.2s ease, border-color 0.2s ease;
         }
-
-        .theme-btn:hover {
-            transform: scale(1.15);
-        }
-
+        .theme-btn:hover { transform: scale(1.15); }
         .theme-btn.cyan { background-color: #00ffcc; }
         .theme-btn.purple { background-color: #d946ef; }
         .theme-btn.green { background-color: #22c55e; }
-
-        .theme-btn.active {
-            border-color: #fff;
-            box-shadow: 0 0 10px rgba(255,255,255,0.5);
-        }
+        .theme-btn.gold { background-color: #f59e0b; }
+        .theme-btn.active { border-color: #fff; box-shadow: 0 0 10px rgba(255,255,255,0.6); }
 
         .nav-links {
             display: flex;
-            gap: 12px;
+            gap: 6px;
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--border-color);
-            padding: 6px;
-            border-radius: 14px;
+            padding: 4px;
+            border-radius: 12px;
         }
 
         .nav-links a {
             color: var(--text-muted);
             text-decoration: none;
             font-weight: 600;
-            font-size: 14px;
-            padding: 8px 18px;
-            border-radius: 10px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 13px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: var(--transition-smooth);
             cursor: pointer;
         }
-
         .nav-links a:hover, .nav-links a.active {
             color: var(--bg-deep);
             background: var(--accent-cyan);
             box-shadow: 0 0 20px var(--border-glow);
         }
 
-        /* Views Pages Container */
+        /* Views Router Container */
         .page-view {
             display: none;
             animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
-
-        .page-view.active {
-            display: block;
-        }
+        .page-view.active { display: block; }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(12px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Hero Section */
+        /* Hero Header */
         header {
             text-align: center;
-            padding: 60px 20px 40px 20px;
+            padding: 70px 20px 40px 20px;
             position: relative;
         }
 
@@ -249,15 +243,14 @@
             background: rgba(0, 255, 204, 0.08);
             color: var(--accent-cyan);
             border: 1px solid var(--border-glow);
-            padding: 8px 20px;
+            padding: 8px 22px;
             border-radius: 30px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
             margin-bottom: 24px;
             letter-spacing: 1.5px;
             text-transform: uppercase;
             box-shadow: 0 0 25px rgba(0, 255, 204, 0.15);
-            transition: color 0.3s ease, border-color 0.3s ease;
         }
 
         .status-dot {
@@ -276,28 +269,60 @@
         }
 
         h1 {
-            font-size: clamp(36px, 7vw, 72px);
+            font-size: clamp(40px, 8vw, 76px);
             font-weight: 800;
-            letter-spacing: -1.5px;
+            letter-spacing: -2px;
             margin-bottom: 16px;
             background: linear-gradient(135deg, #ffffff 30%, var(--accent-cyan) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            transition: background 0.3s ease;
         }
 
         p.subtitle {
             color: var(--text-muted);
-            font-size: clamp(15px, 2vw, 18px);
-            max-width: 600px;
-            margin: 0 auto;
+            font-size: clamp(16px, 2vw, 19px);
+            max-width: 650px;
+            margin: 0 auto 30px auto;
             line-height: 1.7;
         }
+
+        .hero-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: var(--accent-cyan);
+            color: var(--bg-deep);
+            padding: 14px 28px;
+            border-radius: 14px;
+            font-weight: 800;
+            text-decoration: none;
+            font-size: 15px;
+            transition: var(--transition-smooth);
+            box-shadow: 0 0 25px var(--border-glow);
+        }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 0 35px var(--border-glow); opacity: 0.95; }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 14px 28px;
+            border-radius: 14px;
+            font-weight: 700;
+            text-decoration: none;
+            font-size: 15px;
+            transition: var(--transition-smooth);
+        }
+        .btn-secondary:hover { border-color: var(--accent-cyan); background: rgba(255, 255, 255, 0.08); transform: translateY(-3px); }
 
         /* Stats Bar */
         .stats-container {
             max-width: 1100px;
-            margin: 30px auto 50px auto;
+            margin: 40px auto 60px auto;
             padding: 0 20px;
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -311,33 +336,28 @@
             padding: 24px;
             text-align: center;
             backdrop-filter: blur(12px);
-            transition: all 0.3s ease;
+            transition: var(--transition-smooth);
         }
-
-        .stat-card:hover {
-            border-color: var(--border-glow);
-            transform: translateY(-4px);
-            box-shadow: 0 10px 30px rgba(0, 255, 204, 0.05);
-        }
+        .stat-card:hover { border-color: var(--border-glow); transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0, 255, 204, 0.05); }
 
         .stat-number {
-            font-size: 32px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 34px;
             font-weight: 800;
             color: var(--accent-cyan);
             margin-bottom: 6px;
             text-shadow: 0 0 20px var(--border-glow);
-            transition: color 0.3s ease;
         }
 
         .stat-label {
             color: var(--text-muted);
-            font-size: 13px;
-            font-weight: 600;
+            font-size: 12px;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 1.2px;
         }
 
-        /* Section Titles */
+        /* Section Header Layout */
         .section-header-flex {
             max-width: 1100px;
             margin: 0 auto 24px auto;
@@ -350,18 +370,18 @@
         }
 
         .section-title {
-            font-size: 22px;
-            font-weight: 700;
+            font-size: 24px;
+            font-weight: 800;
             display: flex;
             align-items: center;
             gap: 12px;
             letter-spacing: -0.5px;
         }
 
-        /* Search & Filter Bar Controls */
+        /* Game Filters & Controls */
         .game-controls {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             flex-wrap: wrap;
             align-items: center;
         }
@@ -370,31 +390,27 @@
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 8px 16px;
+            padding: 10px 16px;
             color: #fff;
             font-family: inherit;
             font-size: 14px;
             outline: none;
             transition: border-color 0.3s ease;
-            width: 180px;
+            width: 200px;
         }
-
-        .search-box:focus {
-            border-color: var(--accent-cyan);
-        }
+        .search-box:focus { border-color: var(--accent-cyan); }
 
         .filter-btn {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--border-color);
             color: var(--text-muted);
-            padding: 8px 14px;
+            padding: 10px 16px;
             border-radius: 12px;
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: var(--transition-smooth);
         }
-
         .filter-btn.active, .filter-btn:hover {
             background: var(--accent-cyan);
             color: var(--bg-deep);
@@ -404,21 +420,18 @@
 
         .random-game-btn {
             background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-            color: #000;
+            color: #030508;
             font-weight: 800;
             border: none;
-            padding: 8px 16px;
+            padding: 10px 18px;
             border-radius: 12px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: var(--transition-smooth);
+            font-size: 13px;
         }
+        .random-game-btn:hover { transform: scale(1.05); box-shadow: 0 0 20px var(--border-glow); }
 
-        .random-game-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px var(--border-glow);
-        }
-
-        /* Cards Layout */
+        /* Grid Containers */
         .container {
             width: 100%;
             max-width: 1100px;
@@ -427,9 +440,9 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 24px;
-            z-index: 1;
         }
 
+        /* Card Component */
         .card {
             background: var(--bg-card);
             backdrop-filter: blur(16px);
@@ -438,7 +451,7 @@
             border-radius: 24px;
             padding: 35px 28px;
             text-align: left;
-            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            transition: var(--transition-smooth);
             position: relative;
             display: flex;
             flex-direction: column;
@@ -446,7 +459,6 @@
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
             overflow: hidden;
         }
-
         .card::before {
             content: '';
             position: absolute;
@@ -454,17 +466,10 @@
             background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 100%);
             pointer-events: none;
         }
-
         .card:hover {
             transform: translateY(-8px);
             border-color: var(--border-glow);
             box-shadow: 0 25px 50px rgba(0, 255, 204, 0.08), 0 0 30px rgba(0, 0, 0, 0.6);
-        }
-
-        .card-team:hover {
-            border-color: var(--accent-cyan);
-            box-shadow: 0 10px 30px rgba(0, 255, 204, 0.15);
-            transform: translateY(-6px);
         }
 
         .card-top {
@@ -481,16 +486,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
+            font-size: 26px;
             background: rgba(255, 255, 255, 0.04);
             border: 1px solid var(--border-color);
             box-shadow: inset 0 2px 5px rgba(255, 255, 255, 0.05);
             transition: transform 0.3s ease;
         }
-
-        .card:hover .card-icon-box {
-            transform: scale(1.08) rotate(5deg);
-        }
+        .card:hover .card-icon-box { transform: scale(1.1) rotate(5deg); }
 
         .card h3 {
             font-size: 22px;
@@ -507,7 +509,7 @@
             line-height: 1.7;
         }
 
-        .btn {
+        .card-btn {
             display: flex;
             align-items: center;
             justify-content: center;
@@ -520,25 +522,25 @@
             border-radius: 14px;
             font-weight: 700;
             text-decoration: none;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: var(--transition-smooth);
             font-size: 15px;
         }
 
-        /* Custom Brand Button Glows */
-        .card-discord:hover .btn { background: #5865F2; color: white; border-color: #5865F2; box-shadow: 0 0 30px rgba(88, 101, 242, 0.5); }
-        .card-roblox:hover .btn { background: #e32636; color: white; border-color: #e32636; box-shadow: 0 0 30px rgba(227, 38, 54, 0.5); }
-        .card-youtube:hover .btn { background: #FF0000; color: white; border-color: #FF0000; box-shadow: 0 0 30px rgba(255, 0, 0, 0.5); }
-        .card-game:hover .btn { background: var(--accent-cyan); color: var(--bg-deep); border-color: var(--accent-cyan); box-shadow: 0 0 30px var(--border-glow); }
+        .card-discord:hover .card-btn { background: #5865F2; color: #fff; border-color: #5865F2; box-shadow: 0 0 30px rgba(88, 101, 242, 0.4); }
+        .card-roblox:hover .card-btn { background: #e32636; color: #fff; border-color: #e32636; box-shadow: 0 0 30px rgba(227, 38, 54, 0.4); }
+        .card-youtube:hover .card-btn { background: #FF0000; color: #fff; border-color: #FF0000; box-shadow: 0 0 30px rgba(255, 0, 0, 0.4); }
+        .card-game:hover .card-btn { background: var(--accent-cyan); color: var(--bg-deep); border-color: var(--accent-cyan); box-shadow: 0 0 30px var(--border-glow); }
+        .card-team:hover { border-color: var(--accent-cyan); }
 
         /* Support Page Styles */
         .support-container {
             width: 100%;
-            max-width: 850px;
-            margin: 10px auto 60px auto;
+            max-width: 900px;
+            margin: 20px auto 60px auto;
             padding: 0 20px;
             display: flex;
             flex-direction: column;
-            gap: 35px;
+            gap: 40px;
         }
 
         .faq-section, .ticket-section {
@@ -546,16 +548,15 @@
             backdrop-filter: blur(16px);
             border: 1px solid var(--border-color);
             border-radius: 24px;
-            padding: 35px;
+            padding: 40px;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
         }
 
         .faq-item {
             border-bottom: 1px solid var(--border-color);
-            padding: 18px 0;
+            padding: 20px 0;
             transition: all 0.3s ease;
         }
-
         .faq-item:first-child { padding-top: 0; }
         .faq-item:last-child { border-bottom: none; padding-bottom: 0; }
 
@@ -570,21 +571,13 @@
             user-select: none;
             transition: color 0.3s ease;
         }
-
         .faq-question span {
-            font-size: 20px;
-            font-weight: 400;
+            font-size: 22px;
             color: var(--accent-cyan);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
-        .faq-item.active .faq-question {
-            color: var(--accent-cyan);
-        }
-
-        .faq-item.active .faq-question span {
-            transform: rotate(45deg);
-        }
+        .faq-item.active .faq-question { color: var(--accent-cyan); }
+        .faq-item.active .faq-question span { transform: rotate(45deg); }
 
         .faq-answer {
             color: var(--text-muted);
@@ -595,28 +588,20 @@
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             line-height: 1.7;
         }
+        .faq-item.active .faq-answer { max-height: 250px; opacity: 1; margin-top: 14px; }
 
-        .faq-item.active .faq-answer {
-            max-height: 200px;
-            opacity: 1;
-            margin-top: 12px;
-        }
-
-        .form-group {
-            margin-bottom: 22px;
-        }
-
+        .form-group { margin-bottom: 24px; }
         label {
             display: block;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
             margin-bottom: 8px;
             color: var(--text-muted);
-            letter-spacing: 0.5px;
+            letter-spacing: 0.8px;
             text-transform: uppercase;
         }
 
-        input, textarea {
+        input, textarea, select {
             width: 100%;
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--border-color);
@@ -626,19 +611,14 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             font-size: 15px;
             outline: none;
-            transition: all 0.3s ease;
+            transition: var(--transition-smooth);
         }
-
-        input:focus, textarea:focus {
+        input:focus, textarea:focus, select:focus {
             border-color: var(--accent-cyan);
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.06);
             box-shadow: 0 0 20px var(--border-glow);
         }
-
-        textarea {
-            resize: vertical;
-            height: 130px;
-        }
+        textarea { resize: vertical; height: 140px; }
 
         .submit-btn {
             display: flex;
@@ -654,66 +634,54 @@
             font-weight: 800;
             font-size: 16px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: var(--transition-smooth);
             box-shadow: 0 0 25px var(--border-glow);
         }
-
-        .submit-btn:hover {
-            opacity: 0.9;
-            box-shadow: 0 0 35px var(--border-glow);
-            transform: translateY(-2px);
-        }
+        .submit-btn:hover { opacity: 0.9; box-shadow: 0 0 35px var(--border-glow); transform: translateY(-2px); }
 
         #success-msg {
             display: none;
-            background: rgba(0, 255, 204, 0.08);
+            background: rgba(0, 255, 204, 0.1);
             border: 1px solid var(--border-glow);
             color: var(--accent-cyan);
             padding: 20px;
             border-radius: 16px;
             text-align: center;
-            font-weight: 600;
+            font-weight: 700;
             margin-bottom: 25px;
             animation: fadeIn 0.4s ease forwards;
-            box-shadow: 0 0 25px rgba(0, 255, 204, 0.1);
         }
 
-        /* Cookie Banner Floating Bar */
+        /* Cookie Consent Floating Bar */
         .cookie-banner {
             position: fixed;
             bottom: 20px;
             left: 50%;
-            transform: translateX(-50%) translateY(120%);
+            transform: translateX(-50%) translateY(150%);
             width: calc(100% - 40px);
-            max-width: 650px;
-            background: rgba(13, 18, 29, 0.95);
+            max-width: 680px;
+            background: rgba(10, 15, 29, 0.95);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--border-glow);
             border-radius: 20px;
-            padding: 20px 24px;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+            padding: 22px 28px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
             z-index: 2000;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 20px;
-            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
-
-        .cookie-banner.show {
-            transform: translateX(-50%) translateY(0);
-        }
+        .cookie-banner.show { transform: translateX(-50%) translateY(0); }
 
         .cookie-text {
             font-size: 13px;
             color: var(--text-muted);
             line-height: 1.5;
         }
-
-        .cookie-text strong {
-            color: #fff;
-        }
+        .cookie-text strong { color: #fff; }
 
         .cookie-btns {
             display: flex;
@@ -721,49 +689,41 @@
             flex-shrink: 0;
         }
 
-        .cookie-btn-accept {
+        .cookie-accept {
             background: var(--accent-cyan);
             color: var(--bg-deep);
             border: none;
-            padding: 10px 18px;
+            padding: 10px 20px;
             border-radius: 12px;
-            font-weight: 700;
+            font-weight: 800;
             font-size: 13px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: var(--transition-smooth);
         }
+        .cookie-accept:hover { opacity: 0.9; box-shadow: 0 0 15px var(--border-glow); }
 
-        .cookie-btn-accept:hover {
-            opacity: 0.9;
-            box-shadow: 0 0 15px var(--border-glow);
-        }
-
-        .cookie-btn-decline {
+        .cookie-decline {
             background: rgba(255, 255, 255, 0.05);
             color: var(--text-muted);
             border: 1px solid var(--border-color);
             padding: 10px 16px;
             border-radius: 12px;
-            font-weight: 600;
+            font-weight: 700;
             font-size: 13px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: var(--transition-smooth);
         }
-
-        .cookie-btn-decline:hover {
-            border-color: rgba(255, 255, 255, 0.2);
-            color: #fff;
-        }
+        .cookie-decline:hover { border-color: rgba(255, 255, 255, 0.3); color: #fff; }
 
         /* Footer */
         footer {
             text-align: center;
-            padding: 35px 20px;
+            padding: 40px 20px;
             color: var(--text-muted);
             font-size: 13px;
             border-top: 1px solid var(--border-color);
             width: 100%;
-            background: rgba(5, 7, 10, 0.9);
+            background: rgba(3, 5, 8, 0.9);
             backdrop-filter: blur(12px);
             letter-spacing: 0.5px;
             z-index: 10;
@@ -785,10 +745,11 @@
 
     <!-- Dynamic Announcement Bar -->
     <div class="announcement-bar" id="announcement-bar">
-        <span id="announcement-text">🔥 Καλωσήρθατε στο επίσημο site του 4PCTEAM! Τσεκάρετε τα νέα μας παιχνίδια στο Roblox!</span>
+        <span>🔥 Welcome to the official 4PCTEAM portal! Explore our latest Roblox experiences and join our developer community!</span>
+        <button class="announcement-close" onclick="dismissAnnouncement()">✕</button>
     </div>
 
-    <!-- Interactive Particle Background Canvas -->
+    <!-- Particle Background & Ambient Glow -->
     <canvas id="particle-canvas"></canvas>
     <div class="ambient-glow"></div>
 
@@ -797,18 +758,20 @@
         <a class="nav-logo" onclick="switchPage('home')">4PCTEAM</a>
         <div class="nav-right-cluster">
             <!-- Audio Toggle Button -->
-            <button class="audio-btn" id="audio-toggle" onclick="toggleAudio()" title="Sound Effects Toggle">🔊</button>
+            <button class="icon-btn" id="audio-toggle" onclick="toggleAudio()" title="Toggle UI Sound Effects">🔊</button>
             
             <!-- Theme Selector Switcher -->
-            <div class="theme-switcher">
+            <div class="control-group">
                 <button class="theme-btn cyan active" onclick="setTheme('cyan')" title="Cyan Theme"></button>
                 <button class="theme-btn purple" onclick="setTheme('purple')" title="Purple Theme"></button>
                 <button class="theme-btn green" onclick="setTheme('green')" title="Green Theme"></button>
+                <button class="theme-btn gold" onclick="setTheme('gold')" title="Gold Theme"></button>
             </div>
             
+            <!-- Navigation Links -->
             <div class="nav-links">
-                <a id="nav-home" class="active" onclick="switchPage('home')">Αρχική</a>
-                <a id="nav-support" onclick="switchPage('support')">Υποστήριξη</a>
+                <a id="nav-home" class="active" onclick="switchPage('home')">Home</a>
+                <a id="nav-support" onclick="switchPage('support')">Support</a>
             </div>
         </div>
     </nav>
@@ -817,80 +780,78 @@
     <div id="page-home" class="page-view active">
         <header>
             <div class="studio-badge">
-                <div class="status-dot"></div> Roblox Development Studio
+                <div class="status-dot"></div> Elite Roblox Development Studio
             </div>
             <h1>4PCTEAM</h1>
-            <p class="subtitle">Κατασκευάζουμε πρωτοποριακά παιχνίδια, immersive εμπειρίες και χτίζουμε μια ζωντανή κοινότητα προγραμματιστών στο Roblox.</p>
+            <p class="subtitle">Crafting cutting-edge games, immersive multiplayer mechanics, and building a vibrant developer ecosystem on Roblox.</p>
+            <div class="hero-actions">
+                <a href="#games-section" class="btn-primary" onclick="playSound()">Explore Games</a>
+                <a href="https://discord.gg/DEsPSh43q3" target="_blank" class="btn-secondary" onclick="playSound()">Join Discord</a>
+            </div>
         </header>
 
         <!-- Stats Bar -->
         <div class="stats-container">
             <div class="stat-card">
                 <div class="stat-number">4+</div>
-                <div class="stat-label">Featured Games</div>
+                <div class="stat-label">Published Games</div>
             </div>
             <div class="stat-card">
                 <div class="stat-number">100%</div>
-                <div class="stat-label">Dedication</div>
+                <div class="stat-label">Studio Dedication</div>
             </div>
             <div class="stat-card">
                 <div class="stat-number">Active</div>
-                <div class="stat-label">Community</div>
+                <div class="stat-label">Community & Devs</div>
             </div>
         </div>
 
         <!-- Official Links Section -->
         <div class="section-header-flex">
-            <div class="section-title">🌐 Κοινότητα & Social</div>
+            <div class="section-title">🌐 Community & Socials</div>
         </div>
         <div class="container">
             <!-- Discord Card -->
             <div class="card card-discord">
                 <div>
-                    <div class="card-top">
-                        <div class="card-icon-box">💬</div>
-                    </div>
+                    <div class="card-top"><div class="card-icon-box">💬</div></div>
                     <h3>Discord Community</h3>
-                    <p>Γίνε μέλος της κοινότητάς μας. Μίλησε με άλλους developers, μάθε για τα νέα updates και πάρε μέρος σε events.</p>
+                    <p>Connect with fellow developers, get instant announcements on game updates, and participate in community events.</p>
                 </div>
-                <a href="https://discord.gg/DEsPSh43q3" target="_blank" class="btn">Join Discord Server</a>
+                <a href="https://discord.gg/DEsPSh43q3" target="_blank" class="card-btn" onclick="playSound()">Join Discord Server</a>
             </div>
 
             <!-- Roblox Group Card -->
             <div class="card card-roblox">
                 <div>
-                    <div class="card-top">
-                        <div class="card-icon-box">🎮</div>
-                    </div>
+                    <div class="card-top"><div class="card-icon-box">🎮</div></div>
                     <h3>Roblox Group</h3>
-                    <p>Επισκέψου το επίσημο group μας (Bill Skaf Studios) στο Roblox για να στηρίξεις τα projects μας!</p>
+                    <p>Visit our official community group (Bill Skaf Studios) on Roblox to support our projects and unlock group perks!</p>
                 </div>
-                <a href="https://www.roblox.com/communities/612987225/Bill-Skaf-Studios" target="_blank" class="btn">Visit Roblox Group</a>
+                <a href="https://www.roblox.com/communities/612987225/Bill-Skaf-Studios" target="_blank" class="card-btn" onclick="playSound()">Visit Roblox Group</a>
             </div>
 
             <!-- YouTube Channel Card -->
             <div class="card card-youtube">
                 <div>
-                    <div class="card-top">
-                        <div class="card-icon-box">📺</div>
-                    </div>
+                    <div class="card-top"><div class="card-icon-box">📺</div></div>
                     <h3>YouTube Channel</h3>
-                    <p>Δες τα επίσημα trailers, αποκλειστικά devlogs, tutorials ανάπτυξης παιχνιδιών και υλικό πίσω από τις κάμερες.</p>
+                    <p>Watch official game trailers, exclusive devlogs, scripting tutorials, and behind-the-scenes content.</p>
                 </div>
-                <a href="https://www.youtube.com/@4PCTEAM" target="_blank" class="btn">Subscribe on YouTube</a>
+                <a href="https://www.youtube.com/@4PCTEAM" target="_blank" class="card-btn" onclick="playSound()">Subscribe on YouTube</a>
             </div>
         </div>
 
         <!-- Games Section with Search, Filters & Random Picker -->
-        <div class="section-header-flex">
-            <div class="section-title">🎮 Τα Παιχνίδια Μας</div>
+        <div id="games-section" class="section-header-flex" style="margin-top: 40px;">
+            <div class="section-title">🎮 Our Games</div>
             <div class="game-controls">
-                <input type="text" id="game-search" class="search-box" placeholder="Αναζήτηση..." oninput="filterGames()">
-                <button class="filter-btn active" onclick="setCategoryFilter('all', this)">Όλα</button>
+                <input type="text" id="game-search" class="search-box" placeholder="Search games..." oninput="filterGames()">
+                <button class="filter-btn active" onclick="setCategoryFilter('all', this)">All</button>
                 <button class="filter-btn" onclick="setCategoryFilter('tycoon', this)">Tycoon</button>
                 <button class="filter-btn" onclick="setCategoryFilter('shooter', this)">Shooter</button>
                 <button class="filter-btn" onclick="setCategoryFilter('casual', this)">Casual</button>
-                <button class="random-game-btn" onclick="pickRandomGame()">🎲 Τυχαίο Παιχνίδι!</button>
+                <button class="random-game-btn" onclick="pickRandomGame()">🎲 Random Game!</button>
             </div>
         </div>
 
@@ -898,104 +859,68 @@
             <!-- Game 1 -->
             <div class="card card-game" data-title="parkour and tycoon" data-category="tycoon">
                 <div>
-                    <div class="card-top">
-                        <div class="card-icon-box">⚡</div>
-                    </div>
+                    <div class="card-top"><div class="card-icon-box">⚡</div></div>
                     <h3>Parkour and Tycoon</h3>
-                    <p>Συνδύασε τις ικανότητες σου στο parkour με τη στρατηγική διαχείρισης σε αυτό το μοναδικό tycoon experience.</p>
+                    <p>Combine high-octane parkour movement skills with strategic economic tycoon management in this unique hybrid experience.</p>
                 </div>
-                <a href="https://www.roblox.com/games/111545675146001/Parkour-and-Tycoon" target="_blank" class="btn">Play on Roblox</a>
+                <a href="https://www.roblox.com/games/111545675146001/Parkour-and-Tycoon" target="_blank" class="card-btn" onclick="playSound()">Play on Roblox</a>
             </div>
 
             <!-- Game 2 -->
             <div class="card card-game" data-title="kinder hatch" data-category="casual">
                 <div>
-                    <div class="card-top">
-                        <div class="card-icon-box">🥚</div>
-                    </div>
+                    <div class="card-top"><div class="card-icon-box">🥚</div></div>
                     <h3>Kinder Hatch</h3>
-                    <p>Εξερεύνησε έναν διασκεδαστικό κόσμο, εκκόλαψε αυγά και μάζεψε σπάνιες συλλογές χαρακτήρων.</p>
+                    <p>Explore a vibrant, colorful world, hatch mystery eggs, and collect rare companion characters in this engaging simulator.</p>
                 </div>
-                <a href="https://www.roblox.com/games/133304947902903/Kinder-Hatch" target="_blank" class="btn">Play on Roblox</a>
+                <a href="https://www.roblox.com/games/133304947902903/Kinder-Hatch" target="_blank" class="card-btn" onclick="playSound()">Play on Roblox</a>
             </div>
 
             <!-- Game 3 -->
             <div class="card card-game" data-title="realistic gun game" data-category="shooter">
                 <div>
-                    <div class="card-top">
-                        <div class="card-icon-box">🎯</div>
-                    </div>
+                    <div class="card-top"><div class="card-icon-box">🎯</div></div>
                     <h3>Realistic Gun Game</h3>
-                    <p>Δοκίμασε τα αντανακλαστικά σου σε αυτό το γρήγορο παιχνίδι δράσης με ρεαλιστικά όπλα και μάχες.</p>
+                    <p>Test your reflexes and tactical combat skills in this fast-paced shooter featuring realistic weaponry and dynamic arenas.</p>
                 </div>
-                <a href="https://www.roblox.com/games/70779070700175/Realistic-gun-game" target="_blank" class="btn">Play on Roblox</a>
+                <a href="https://www.roblox.com/games/70779070700175/Realistic-gun-game" target="_blank" class="card-btn" onclick="playSound()">Play on Roblox</a>
             </div>
 
             <!-- Game 4 -->
             <div class="card card-game" data-title="shooter game" data-category="shooter">
                 <div>
-                    <div class="card-top">
-                        <div class="card-icon-box">🔫</div>
-                    </div>
+                    <div class="card-top"><div class="card-icon-box">🔫</div></div>
                     <h3>SHOOTER GAME</h3>
-                    <p>Μπες στη δράση με γρήγορους ρυθμούς, έντονες μάχες και δοκίμασε τις σκοπευτικές σου ικανότητες.</p>
+                    <p>Jump straight into high-intensity action battles, master advanced gunplay, and dominate the leaderboard.</p>
                 </div>
-                <a href="https://www.roblox.com/games/92412466953609/SHOOTER-GAME" target="_blank" class="btn">Play on Roblox</a>
+                <a href="https://www.roblox.com/games/92412466953609/SHOOTER-GAME" target="_blank" class="card-btn" onclick="playSound()">Play on Roblox</a>
             </div>
         </div>
 
         <!-- Team Section -->
         <div class="section-header-flex" style="margin-top: 50px;">
-            <div class="section-title">👥 Η Ομάδα Μας (Our Team)</div>
+            <div class="section-title">👥 The Core Team</div>
         </div>
 
         <div class="container" id="team-container">
-            <!-- Βασίλης -->
+            <!-- Bill Skaf -->
             <div class="card card-team">
                 <div>
-                    <div class="card-top">
-                        <div class="card-icon-box">👨‍💻</div>
-                    </div>
-                    <h3>Βασίλης</h3>
-                    <p style="color: var(--accent-cyan); font-weight: 700; margin-bottom: 8px;">Lead Developer & Founder</p>
-                    <p>Υπεύθυνος για τον προγραμματισμό (scripting), την κατασκευή των παιχνιδιών και την ανάπτυξη του website.</p>
+                    <div class="card-top"><div class="card-icon-box">👑</div></div>
+                    <h3>Bill Skaf</h3>
+                    <p>Founder, Lead Developer & Lead Scripter. Architecting the Luau game systems, UI frameworks, and overall vision for 4PCTEAM.</p>
                 </div>
+                <a href="https://www.roblox.com/communities/612987225/Bill-Skaf-Studios" target="_blank" class="card-btn" onclick="playSound()">View Profile</a>
             </div>
 
-            <!-- Γιώργος -->
+            <!-- Community & Collaborators -->
             <div class="card card-team">
                 <div>
-                    <div class="card-top">
-                        <div class="card-icon-box">🛠️</div>
-                    </div>
-                    <h3>Γιώργος</h3>
-                    <p style="color: var(--accent-cyan); font-weight: 700; margin-bottom: 8px;">Developer & Builder</p>
-                    <p>Σχεδιασμός χαρτών, 3D modeling και δημιουργία των κόσμων στα Roblox projects της ομάδας.</p>
+                    <div class="card-top"><div class="card-icon-box">💡</div></div>
+                    <h3>4PCTEAM Contributors</h3>
+                    <p>Talented friends, builders, and community moderators collaborating on testing, feedback, and special map designs.</p>
                 </div>
-            </div>
-
-            <!-- Σοφία -->
-            <div class="card card-team">
-                <div>
-                    <div class="card-top">
-                        <div class="card-icon-box">🎨</div>
-                    </div>
-                    <h3>Σοφία</h3>
-                    <p style="color: var(--accent-cyan); font-weight: 700; margin-bottom: 8px;">UI / UX & Graphic Designer</p>
-                    <p>Σχεδιασμός των μενού, γραφικών, thumbnails και εικαστικών για τα παιχνίδια και τα social media.</p>
-                </div>
-            </div>
-
-            <!-- Νικόλας -->
-            <div class="card card-team">
-                <div>
-                    <div class="card-top">
-                        <div class="card-icon-box">⚡</div>
-                    </div>
-                    <h3>Νικόλας</h3>
-                    <p style="color: var(--accent-cyan); font-weight: 700; margin-bottom: 8px;">Game Tester & Community Manager</p>
-                    <p>Δοκιμές παιχνιδιών (testing), εύρεση bugs και διαχείριση της κοινότητας στο Discord.</p>
-                </div>
+                <a href="https://discord.gg/DEsPSh43q3" target="_blank" class="card-btn" onclick="playSound()">Meet the Community</a>
             </div>
         </div>
     </div>
@@ -1003,87 +928,83 @@
     <!-- SUPPORT PAGE VIEW -->
     <div id="page-support" class="page-view">
         <header>
-            <div class="studio-badge">4PCTEAM Support Center</div>
-            <h1>Πώς μπορούμε να βοηθήσουμε;</h1>
-            <p class="subtitle">Βρες απαντήσεις στις συνήθεις ερωτήσεις σου ή στείλε μας το μήνυμά σου για άμεση εξυπηρέτηση.</p>
+            <div class="studio-badge">
+                <div class="status-dot"></div> Help Center & Support
+            </div>
+            <h1>Support & FAQ</h1>
+            <p class="subtitle">Have questions about our games, bug reports, or group membership? Check our FAQ or submit a ticket below.</p>
         </header>
 
         <div class="support-container">
             <!-- FAQ Section -->
             <div class="faq-section">
-                <div class="section-title" style="font-size: 18px; color: #fff; margin-bottom: 20px; padding: 0;">💡 Συχνές Ερωτήσεις (FAQ)</div>
+                <h3 style="margin-bottom: 24px; font-size: 20px;">Frequently Asked Questions</h3>
                 
                 <div class="faq-item">
-                    <div class="faq-question">Πώς μπορώ να μπω στην ομάδα ή να γίνω developer; <span>+</span></div>
-                    <div class="faq-answer">Μπορείς να επικοινωνήσεις μαζί μας μέσω του επίσημου Discord server μας για να μάθεις πότε ανοίγουν αιτήσεις.</div>
+                    <div class="faq-question" onclick="toggleFaq(this)">How can I join the 4PCTEAM Roblox Group? <span>+</span></div>
+                    <div class="faq-answer">Simply visit our official Roblox group (Bill Skaf Studios) linked on the homepage and click the "Join Group" button. Group members often get special in-game bonuses!</div>
                 </div>
 
                 <div class="faq-item">
-                    <div class="faq-question">Αντιμετωπίζω bug σε κάποιο παιχνίδι. Πού το αναφέρω; <span>+</span></div>
-                    <div class="faq-answer">Μπορείς να συμπληρώσεις την παρακάτω φόρμα υποστήριξης ή να ανοίξεις ticket στο Discord κανάλι μας.</div>
-                </div>
-
-                <!-- Ερώτηση για τα Cookies -->
-                <div class="faq-item">
-                    <div class="faq-question">Χρησιμοποιεί η ιστοσελίδα cookies; <span>+</span></div>
-                    <div class="faq-answer">Χρησιμοποιούμε μόνο βασικά και απαραίτητα cookies (τοπική αποθήκευση LocalStorage) για να αποθηκεύουμε τις προτιμήσεις σου, όπως το επιλεγμένο θέμα εμφάνισης (Theme) και τις ρυθμίσεις ήχου. Δεν συλλέγουμε ούτε κοινοποιούμε προσωπικά δεδομένα.</div>
+                    <div class="faq-question" onclick="toggleFaq(this)">Where can I report bugs or glitches in your games? <span>+</span></div>
+                    <div class="faq-answer">You can report any bugs directly through our Discord server in the bug-reports channel or by submitting a support ticket using the form below.</div>
                 </div>
 
                 <div class="faq-item">
-                    <div class="faq-question">Πότε θα βγουν νέα updates στα παιχνίδια; <span>+</span></div>
-                    <div class="faq-answer">Όλα τα νέα announcements και τα patch notes ανακοινώνονται πρώτα στο Discord και στο YouTube κανάλι μας!</div>
+                    <div class="faq-question" onclick="toggleFaq(this)">Are you looking for new developers or builders? <span>+</span></div>
+                    <div class="faq-answer">We occasionally open applications for talented builders and scripters. Keep an eye on our Discord announcements for application windows!</div>
                 </div>
             </div>
 
-            <!-- Ticket Form Section -->
+            <!-- Ticket Submission Form -->
             <div class="ticket-section">
-                <div class="section-title" style="font-size: 18px; color: #fff; margin-bottom: 20px; padding: 0;">🎫 Υποβολή Αιτήματος (Support Ticket)</div>
+                <h3 style="margin-bottom: 24px; font-size: 20px;">Submit a Support Ticket</h3>
+                <div id="success-msg">🎉 Ticket submitted successfully! Our team will review your request shortly.</div>
                 
-                <div id="success-msg">
-                    ✨ Το μήνυμά σου στάλθηκε επιτυχώς!<br>
-                    <span style="font-size: 13px; color: var(--text-muted); font-weight: 400;">Θα επικοινωνήσουμε σύντομα μαζί σου.</span>
-                </div>
-
-                <form id="support-form" onsubmit="handleFormSubmit(event)">
+                <form id="ticket-form" onsubmit="submitTicket(event)">
                     <div class="form-group">
-                        <label for="username">Roblox / Discord Username</label>
-                        <input type="text" id="username" placeholder="π.χ. BillSkaf" required>
+                        <label for="ticket-name">Your Roblox / Discord Username</label>
+                        <input type="text" id="ticket-name" required placeholder="e.g. BillSkaf">
                     </div>
-
                     <div class="form-group">
-                        <label for="email">Email επικοινωνίας</label>
-                        <input type="email" id="email" placeholder="name@example.com" required>
+                        <label for="ticket-category">Category</label>
+                        <select id="ticket-category">
+                            <option value="bug">Bug / Glitch Report</option>
+                            <option value="ban">Ban Appeal</option>
+                            <option value="collab">Collaboration / Question</option>
+                            <option value="other">Other Inquiry</option>
+                        </select>
                     </div>
-
                     <div class="form-group">
-                        <label for="message">Περιγραφή προβλήματος / Ερώτησης</label>
-                        <textarea id="message" placeholder="Γράψε εδώ λεπτομέρειες για το πρόβλημα που αντιμετωπίζεις..." required></textarea>
+                        <label for="ticket-message">Message Details</label>
+                        <textarea id="ticket-message" required placeholder="Describe your issue or question in detail..."></textarea>
                     </div>
-
-                    <button type="submit" class="submit-btn">Αποστολή Αιτήματος</button>
+                    <button type="submit" class="submit-btn" onclick="playSound()">Send Support Ticket</button>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- Floating Cookie Banner -->
-    <div id="cookie-banner" class="cookie-banner">
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 4PCTEAM & Bill Skaf Studios. All rights reserved. Built with passion for Roblox.</p>
+    </footer>
+
+    <!-- Cookie Consent Banner -->
+    <div class="cookie-banner" id="cookie-banner">
         <div class="cookie-text">
-            <strong>🍪 Χρήση Cookies:</strong> Χρησιμοποιούμε βασικά cookies/local storage για να θυμόμαστε τις προτιμήσεις σου (θέμα & ήχος) για καλύτερη εμπειρία περιήγησης.
+            <strong>🍪 Cookie Notice:</strong> We use local preferences to remember your theme settings and sound toggles. By continuing, you agree to our usage.
         </div>
         <div class="cookie-btns">
-            <button class="cookie-btn-accept" onclick="acceptCookies()">Αποδοχή</button>
-            <button class="cookie-btn-decline" onclick="declineCookies()">Απόρριψη</button>
+            <button class="cookie-accept" onclick="acceptCookies()">Accept</button>
+            <button class="cookie-decline" onclick="declineCookies()">Decline</button>
         </div>
     </div>
 
-    <footer>
-        <p>&copy; 2026 4PCTEAM & Bill Skaf Studios. All Rights Reserved.</p>
-    </footer>
-
+    <!-- JavaScript Application Logic -->
     <script>
-        // Web Audio Synthesizer
-        let soundEnabled = true;
+        // --- Web Audio API Procedural Sound Effects ---
+        let audioEnabled = true;
         let audioCtx = null;
 
         function initAudio() {
@@ -1092,90 +1013,181 @@
             }
         }
 
-        function playSound(type) {
-            if (!soundEnabled) return;
+        function playSound(type = 'click') {
+            if (!audioEnabled) return;
             try {
                 initAudio();
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
 
-                if (type === 'hover') {
+                const now = audioCtx.currentTime;
+                if (type === 'click') {
                     osc.type = 'sine';
-                    osc.frequency.setValueAtTime(320, audioCtx.currentTime);
-                    osc.frequency.exponentialRampToValueAtTime(480, audioCtx.currentTime + 0.04);
-                    gain.gain.setValueAtTime(0.015, audioCtx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.04);
-                    osc.start();
-                    osc.stop(audioCtx.currentTime + 0.04);
-                } else if (type === 'click') {
-                    osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(520, audioCtx.currentTime);
-                    osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.08);
-                    gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
-                    osc.start();
-                    osc.stop(audioCtx.currentTime + 0.08);
+                    osc.frequency.setValueAtTime(580, now);
+                    osc.frequency.exponentialRampToValueAtTime(880, now + 0.08);
+                    gain.gain.setValueAtTime(0.08, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+                    osc.start(now);
+                    osc.stop(now + 0.08);
                 }
-            } catch (e) {}
+            } catch (e) {
+                console.warn('Audio playback prevented or not supported', e);
+            }
         }
 
         function toggleAudio() {
-            soundEnabled = !soundEnabled;
+            audioEnabled = !audioEnabled;
             const btn = document.getElementById('audio-toggle');
-            btn.innerText = soundEnabled ? '🔊' : '🔇';
-            if (soundEnabled) playSound('click');
+            btn.textContent = audioEnabled ? '🔊' : '🔇';
+            playSound('click');
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const interactiveElements = document.querySelectorAll('a, button, .card, .faq-question');
-            interactiveElements.forEach(el => {
-                el.addEventListener('mouseenter', () => playSound('hover'));
-                el.addEventListener('click', () => playSound('click'));
-            });
+        // --- Theme Switcher ---
+        function setTheme(themeName) {
+            playSound('click');
+            document.body.className = '';
+            if (themeName !== 'cyan') {
+                document.body.classList.add('theme-' + themeName);
+            }
+            document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            localStorage.setItem('4pcteam_theme', themeName);
+        }
+
+        // Load saved theme on startup
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('4pcteam_theme');
+            if (savedTheme) {
+                const btn = document.querySelector(`.theme-btn.${savedTheme}`);
+                if (btn) btn.click();
+            }
+            if (!localStorage.getItem('4pcteam_cookies')) {
+                setTimeout(() => {
+                    document.getElementById('cookie-banner').classList.add('show');
+                }, 1000);
+            }
         });
 
-        // Load Announcement from Admin Panel
-        function loadAnnouncement() {
-            const saved = localStorage.getItem('4pcteam_announcement');
-            if (saved) {
-                document.getElementById('announcement-text').innerText = saved;
-            }
-        }
-        window.addEventListener('DOMContentLoaded', loadAnnouncement);
-
-        // Page Router Script
+        // --- SPA Page Router ---
         function switchPage(pageId) {
-            document.querySelectorAll('.page-view').forEach(page => page.classList.remove('active'));
-            document.querySelectorAll('.nav-links a').forEach(link => link.classList.remove('active'));
+            playSound('click');
+            document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
 
             document.getElementById('page-' + pageId).classList.add('active');
             document.getElementById('nav-' + pageId).classList.add('active');
-            
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Game Search & Filter Script
-        let currentCategory = 'all';
-
-        function setCategoryFilter(category, btn) {
-            currentCategory = category;
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            filterGames();
+        // --- Announcement Dismiss ---
+        function dismissAnnouncement() {
+            playSound('click');
+            const bar = document.getElementById('announcement-bar');
+            bar.style.transition = 'all 0.4s ease';
+            bar.style.opacity = '0';
+            bar.style.maxHeight = '0';
+            bar.style.padding = '0';
+            setTimeout(() => bar.remove(), 400);
         }
 
+        // --- Interactive Particle Canvas ---
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let mouse = { x: null, y: null, radius: 120 };
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        });
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 0.8;
+                this.vy = (Math.random() - 0.5) * 0.8;
+                this.size = Math.random() * 2 + 1;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+
+                // Mouse interaction
+                let dx = mouse.x - this.x;
+                let dy = mouse.y - this.y;
+                let dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < mouse.radius) {
+                    let angle = Math.atan2(dy, dx);
+                    this.x -= Math.cos(angle) * 1.5;
+                    this.y -= Math.sin(angle) * 1.5;
+                }
+            }
+            draw() {
+                ctx.fillStyle = 'rgba(0, 255, 204, 0.45)';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            let count = Math.floor((canvas.width * canvas.height) / 14000);
+            for (let i = 0; i < count; i++) {
+                particles.push(new Particle());
+            }
+        }
+        initParticles();
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+
+                for (let j = i + 1; j < particles.length; j++) {
+                    let dx = particles[i].x - particles[j].x;
+                    let dy = particles[i].y - particles[j].y;
+                    let dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 110) {
+                        ctx.strokeStyle = `rgba(0, 255, 204, ${0.15 * (1 - dist / 110)})`;
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        // --- Games Search & Category Filter ---
         function filterGames() {
-            const query = document.getElementById('game-search').value.toLowerCase().trim();
-            const cards = document.querySelectorAll('#games-container .card-game');
-
+            const query = document.getElementById('game-search').value.toLowerCase();
+            const cards = document.querySelectorAll('#games-container .card');
             cards.forEach(card => {
-                const title = card.getAttribute('data-title').toLowerCase();
+                const title = card.getAttribute('data-title');
                 const category = card.getAttribute('data-category');
-
                 const matchesSearch = title.includes(query);
-                const matchesCategory = (currentCategory === 'all' || category === currentCategory);
+                const activeFilter = document.querySelector('.filter-btn.active').textContent.toLowerCase();
+                const matchesCategory = activeFilter === 'all' || category === activeFilter;
 
                 if (matchesSearch && matchesCategory) {
                     card.style.display = 'flex';
@@ -1185,195 +1197,75 @@
             });
         }
 
-        // Random Game Picker Logic
-        function pickRandomGame() {
-            const games = [
-                { name: 'Parkour and Tycoon', url: 'https://www.roblox.com/games/111545675146001/Parkour-and-Tycoon' },
-                { name: 'Kinder Hatch', url: 'https://www.roblox.com/games/133304947902903/Kinder-Hatch' },
-                { name: 'Realistic Gun Game', url: 'https://www.roblox.com/games/70779070700175/Realistic-gun-game' },
-                { name: 'SHOOTER GAME', url: 'https://www.roblox.com/games/92412466953609/SHOOTER-GAME' }
-            ];
+        function setCategoryFilter(category, btn) {
+            playSound('click');
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            // Reset search input when switching categories
+            document.getElementById('game-search').value = '';
+            filterGames();
+            
+            // Apply category filter directly
+            const cards = document.querySelectorAll('#games-container .card');
+            cards.forEach(card => {
+                const cat = card.getAttribute('data-category');
+                if (category === 'all' || cat === category) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
 
-            const random = games[Math.floor(Math.random() * games.length)];
-            if (confirm('🎲 Το τυχαίο παιχνίδι σου είναι: ' + random.name + '\n\nΘέλεις να μεταφερθείς στο Roblox για να παίξεις;')) {
-                window.open(random.url, '_blank');
+        // --- Random Game Picker ---
+        function pickRandomGame() {
+            playSound('click');
+            const cards = Array.from(document.querySelectorAll('#games-container .card')).filter(c => c.style.display !== 'none');
+            if (cards.length === 0) return;
+            
+            cards.forEach(c => c.style.borderColor = 'var(--border-color)');
+            const randomCard = cards[Math.floor(Math.random() * cards.length)];
+            randomCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            randomCard.style.borderColor = 'var(--accent-cyan)';
+            randomCard.style.boxShadow = '0 0 40px var(--border-glow)';
+            setTimeout(() => {
+                randomCard.style.borderColor = 'var(--border-color)';
+                randomCard.style.boxShadow = '';
+            }, 2000);
+        }
+
+        // --- FAQ Accordion ---
+        function toggleFaq(el) {
+            playSound('click');
+            const item = el.parentElement;
+            const wasActive = item.classList.contains('active');
+            document.querySelectorAll('.faq-item').forEach(f => f.classList.remove('active'));
+            if (!wasActive) {
+                item.classList.add('active');
             }
         }
 
-        // FAQ Accordion Script
-        const faqItems = document.querySelectorAll('.faq-item');
-        faqItems.forEach(item => {
-            const question = item.querySelector('.faq-question');
-            question.addEventListener('click', () => {
-                const isActive = item.classList.contains('active');
-                faqItems.forEach(other => other.classList.remove('active'));
-                if (!isActive) {
-                    item.classList.add('active');
-                }
-            });
-        });
-
-        // Support Form Handler
-        function handleFormSubmit(event) {
-            event.preventDefault();
-            const form = document.getElementById('support-form');
-            const successMsg = document.getElementById('success-msg');
-            
-            form.style.opacity = '0';
-            setTimeout(() => {
-                form.style.display = 'none';
-                successMsg.style.display = 'block';
-                form.reset();
-            }, 200);
+        // --- Ticket Form Submission ---
+        function submitTicket(e) {
+            e.preventDefault();
+            playSound('click');
+            document.getElementById('ticket-form').style.display = 'none';
+            document.getElementById('success-msg').style.display = 'block';
         }
 
-        // Theme Switcher Logic
-        function setTheme(themeName) {
-            document.body.className = themeName === 'cyan' ? '' : 'theme-' + themeName;
-            document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelector('.theme-btn.' + themeName).classList.add('active');
-            localStorage.setItem('4pcteam_theme', themeName);
-        }
-
-        // Cookie Consent Logic
+        // --- Cookie Consent Logic ---
         function acceptCookies() {
+            playSound('click');
             localStorage.setItem('4pcteam_cookies', 'accepted');
             document.getElementById('cookie-banner').classList.remove('show');
         }
 
         function declineCookies() {
+            playSound('click');
             localStorage.setItem('4pcteam_cookies', 'declined');
             document.getElementById('cookie-banner').classList.remove('show');
         }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedTheme = localStorage.getItem('4pcteam_theme');
-            if (savedTheme) setTheme(savedTheme);
-
-            const cookieConsent = localStorage.getItem('4pcteam_cookies');
-            if (!cookieConsent) {
-                setTimeout(() => {
-                    document.getElementById('cookie-banner').classList.add('show');
-                }, 1000);
-            }
-        });
-
-        // Interactive Particle Canvas Animation Script
-        const canvas = document.getElementById('particle-canvas');
-        const ctx = canvas.getContext('2d');
-
-        let particlesArray = [];
-        let mouse = { x: null, y: null, radius: 120 };
-
-        window.addEventListener('mousemove', (event) => {
-            mouse.x = event.clientX;
-            mouse.y = event.clientY;
-        });
-
-        window.addEventListener('mouseout', () => {
-            mouse.x = null;
-            mouse.y = null;
-        });
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        class Particle {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 2 + 1;
-                this.baseX = this.x;
-                this.baseY = this.y;
-                this.vx = (Math.random() - 0.5) * 0.6;
-                this.vy = (Math.random() - 0.5) * 0.6;
-            }
-
-            update() {
-                this.x += this.vx;
-                this.y += this.vy;
-
-                if (this.x < 0 || this.x > canvas.width) this.vx = -this.vx;
-                if (this.y < 0 || this.y > canvas.height) this.vy = -this.vy;
-
-                if (mouse.x != null && mouse.y != null) {
-                    let dx = mouse.x - this.x;
-                    let dy = mouse.y - this.y;
-                    let distance = Math.sqrt(dx * dx + dy * dy);
-                    if (distance < mouse.radius) {
-                        let forceDirectionX = dx / distance;
-                        let forceDirectionY = dy / distance;
-                        let force = (mouse.radius - distance) / mouse.radius;
-                        this.x -= forceDirectionX * force * 3;
-                        this.y -= forceDirectionY * force * 3;
-                    }
-                }
-            }
-
-            draw() {
-                ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--accent-cyan').trim();
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.closePath();
-                ctx.fill();
-            }
-        }
-
-        function initParticles() {
-            particlesArray = [];
-            let numParticles = (canvas.width * canvas.height) / 12000;
-            for (let i = 0; i < numParticles; i++) {
-                particlesArray.push(new Particle());
-            }
-        }
-
-        function animateParticles() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            for (let i = 0; i < particlesArray.length; i++) {
-                particlesArray[i].update();
-                particlesArray[i].draw();
-
-                for (let j = i + 1; j < particlesArray.length; j++) {
-                    let dx = particlesArray[i].x - particlesArray[j].x;
-                    let dy = particlesArray[i].y - particlesArray[j].y;
-                    let distance = Math.sqrt(dx * dx + dy * dy);
-
-                    if (distance < 100) {
-                        ctx.strokeStyle = getComputedStyle(document.body).getPropertyValue('--accent-cyan').trim();
-                        ctx.globalAlpha = (1 - (distance / 100)) * 0.15;
-                        ctx.lineWidth = 0.8;
-                        ctx.beginPath();
-                        ctx.moveTo(particlesArray[i].x, particlesArray[i].y);
-                        ctx.lineTo(particlesArray[j].x, particlesArray[j].y);
-                        ctx.stroke();
-                        ctx.globalAlpha = 1.0;
-                    }
-                }
-            }
-            requestAnimationFrame(animateParticles);
-        }
-
-        initParticles();
-        animateParticles();
-
-        // SECRET EASTER EGG: Πατώντας Left Ctrl εμφανίζεται το Cookie Banner!
-        document.addEventListener('keydown', (e) => {
-            if (e.code === 'ControlLeft') {
-                const banner = document.getElementById('cookie-banner');
-                if (banner) {
-                    banner.classList.add('show');
-                    if (typeof playSound === 'function') {
-                        playSound('click');
-                    }
-                }
-            }
-        });
     </script>
 </body>
 </html>
