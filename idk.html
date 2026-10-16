@@ -1,1112 +1,122 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>4PCTEAM | Elite Roblox Development Studio</title>
+    <title>Discord MediaPipe Tracker</title>
+    
+    <!-- Σταθερά και δοκιμασμένα CDNs (Δεν σπάνε) -->
+    <script src="https://jsdelivr.net" crossorigin="anonymous"></script>
+    <script src="https://jsdelivr.net" crossorigin="anonymous"></script>
+    <script src="https://jsdelivr.net" crossorigin="anonymous"></script>
+
     <style>
-        :root {
-            --bg-deep: #030508;
-            --bg-surface: #0a0f1d;
-            --bg-card: rgba(13, 19, 33, 0.82);
-            --accent-cyan: #00ffcc;
-            --accent-purple: #9d4edd;
-            --accent-blue: #3a86ff;
-            --text-main: #ffffff;
-            --text-muted: #94a3b8;
-            --border-color: rgba(255, 255, 255, 0.08);
-            --border-glow: rgba(0, 255, 204, 0.35);
-            --font-main: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-            --transition-smooth: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-        }
-
-        /* Theme Variations */
-        body.theme-purple {
-            --accent-cyan: #d946ef;
-            --border-glow: rgba(217, 70, 239, 0.35);
-        }
-        body.theme-green {
-            --accent-cyan: #22c55e;
-            --border-glow: rgba(34, 197, 94, 0.35);
-        }
-        body.theme-gold {
-            --accent-cyan: #f59e0b;
-            --border-glow: rgba(245, 158, 11, 0.35);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: var(--font-main);
-            background-color: var(--bg-deep);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            overflow-x: hidden;
-            position: relative;
-        }
-
-        /* Announcement Bar */
-        .announcement-bar {
-            background: linear-gradient(90deg, rgba(0,255,204,0.15) 0%, rgba(157,78,221,0.15) 100%);
-            border-bottom: 1px solid var(--border-glow);
-            color: #fff;
-            padding: 10px 20px;
-            text-align: center;
-            font-size: 13px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            z-index: 1001;
-        }
-
-        .announcement-close {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 800;
-        }
-        .announcement-close:hover { color: #fff; }
-
-        /* Canvas Particle Background */
-        #particle-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -2;
-            pointer-events: none;
-        }
-
-        .ambient-glow {
-            position: fixed;
-            width: 700px;
-            height: 700px;
-            background: radial-gradient(circle, rgba(0, 255, 204, 0.12) 0%, rgba(157, 78, 221, 0.05) 50%, transparent 75%);
-            top: -250px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: -1;
-            border-radius: 50%;
-            pointer-events: none;
-            filter: blur(90px);
-            animation: pulseGlow 8s ease-in-out infinite alternate;
-        }
-
-        @keyframes pulseGlow {
-            0% { transform: translateX(-50%) scale(1); opacity: 0.7; }
-            100% { transform: translateX(-50%) scale(1.2); opacity: 1; }
-        }
-
-        /* Navigation Bar */
-        nav {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            background: rgba(3, 5, 8, 0.88);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 40px;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.6);
-        }
-
-        .nav-logo {
-            font-family: var(--font-mono);
-            font-weight: 800;
-            font-size: 22px;
-            background: linear-gradient(135deg, #ffffff 30%, var(--accent-cyan) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-decoration: none;
-            cursor: pointer;
-            letter-spacing: -0.5px;
-        }
-
-        .nav-right-cluster {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .control-group {
-            display: flex;
-            gap: 8px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--border-color);
-            padding: 4px;
-            border-radius: 12px;
-            align-items: center;
-        }
-
-        .icon-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-main);
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 15px;
-        }
-        .icon-btn:hover { background: rgba(255, 255, 255, 0.08); color: var(--accent-cyan); }
-
-        .theme-btn {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            border: 2px solid transparent;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-        .theme-btn:hover { transform: scale(1.15); }
-        .theme-btn.cyan { background-color: #00ffcc; }
-        .theme-btn.purple { background-color: #d946ef; }
-        .theme-btn.green { background-color: #22c55e; }
-        .theme-btn.gold { background-color: #f59e0b; }
-        .theme-btn.active { border-color: #fff; box-shadow: 0 0 10px rgba(255,255,255,0.6); }
-
-        .nav-links {
-            display: flex;
-            gap: 6px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--border-color);
-            padding: 4px;
-            border-radius: 12px;
-        }
-
-        .nav-links a {
-            color: var(--text-muted);
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 13px;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: var(--transition-smooth);
-        }
-        .nav-links a:hover, .nav-links a.active {
-            color: var(--bg-deep);
-            background: var(--accent-cyan);
-            box-shadow: 0 0 20px var(--border-glow);
-        }
-
-        /* Views Pages */
-        .page-view {
-            display: none;
-            animation: fadeIn 0.4s ease forwards;
-        }
-        .page-view.active { display: block; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Header */
-        header {
-            text-align: center;
-            padding: 70px 20px 40px 20px;
-        }
-
-        .studio-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(0, 255, 204, 0.08);
-            color: var(--accent-cyan);
-            border: 1px solid var(--border-glow);
-            padding: 8px 22px;
-            border-radius: 30px;
-            font-size: 12px;
-            font-weight: 700;
-            margin-bottom: 24px;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            background-color: var(--accent-cyan);
-            border-radius: 50%;
-            box-shadow: 0 0 12px var(--accent-cyan);
-            animation: pulse-dot 2s infinite;
-        }
-
-        @keyframes pulse-dot {
-            0% { transform: scale(0.95); opacity: 1; box-shadow: 0 0 0 0 var(--border-glow); }
-            70% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 8px rgba(0, 0, 0, 0); }
-            100% { transform: scale(0.95); opacity: 1; box-shadow: 0 0 0 0 rgba(0, 0, 0, 0); }
-        }
-
-        h1 {
-            font-size: clamp(40px, 8vw, 76px);
-            font-weight: 800;
-            letter-spacing: -2px;
-            margin-bottom: 16px;
-            background: linear-gradient(135deg, #ffffff 30%, var(--accent-cyan) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        p.subtitle {
-            color: var(--text-muted);
-            font-size: clamp(16px, 2vw, 19px);
-            max-width: 650px;
-            margin: 0 auto 30px auto;
-            line-height: 1.7;
-        }
-
-        .hero-actions {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .btn-primary {
-            background: var(--accent-cyan);
-            color: var(--bg-deep);
-            padding: 14px 28px;
-            border-radius: 14px;
-            font-weight: 800;
-            text-decoration: none;
-            font-size: 15px;
-            transition: var(--transition-smooth);
-            box-shadow: 0 0 25px var(--border-glow);
-        }
-        .btn-primary:hover { transform: translateY(-3px); opacity: 0.95; }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.04);
-            color: var(--text-main);
-            border: 1px solid var(--border-color);
-            padding: 14px 28px;
-            border-radius: 14px;
-            font-weight: 700;
-            text-decoration: none;
-            font-size: 15px;
-            transition: var(--transition-smooth);
-        }
-        .btn-secondary:hover { border-color: var(--accent-cyan); background: rgba(255, 255, 255, 0.08); transform: translateY(-3px); }
-
-        /* Stats Bar */
-        .stats-container {
-            max-width: 1100px;
-            margin: 40px auto 60px auto;
-            padding: 0 20px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-        }
-
-        .stat-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            padding: 24px;
-            text-align: center;
-            backdrop-filter: blur(12px);
-            transition: var(--transition-smooth);
-        }
-        .stat-card:hover { border-color: var(--border-glow); transform: translateY(-4px); }
-
-        .stat-number {
-            font-family: var(--font-mono);
-            font-size: 34px;
-            font-weight: 800;
-            color: var(--accent-cyan);
-            margin-bottom: 6px;
-        }
-
-        .stat-label {
-            color: var(--text-muted);
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1.2px;
-        }
-
-        /* Section Layout Container */
-        .section-header-flex {
-            max-width: 1100px;
-            margin: 0 auto 24px auto;
-            padding: 0 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .section-title {
-            font-size: 24px;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .game-controls {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
-        .search-box {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 10px 16px;
-            color: #fff;
-            font-family: inherit;
-            font-size: 14px;
-            outline: none;
-            width: 200px;
-        }
-        .search-box:focus { border-color: var(--accent-cyan); }
-
-        .filter-btn {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--border-color);
-            color: var(--text-muted);
-            padding: 10px 16px;
-            border-radius: 12px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition-smooth);
-        }
-        .filter-btn.active, .filter-btn:hover {
-            background: var(--accent-cyan);
-            color: var(--bg-deep);
-            border-color: var(--accent-cyan);
-            box-shadow: 0 0 15px var(--border-glow);
-        }
-
-        .random-game-btn {
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-            color: #030508;
-            font-weight: 800;
-            border: none;
-            padding: 10px 18px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 13px;
-            transition: var(--transition-smooth);
-        }
-        .random-game-btn:hover { transform: scale(1.05); }
-
-        .container {
-            width: 100%;
-            max-width: 1100px;
-            margin: 0 auto 60px auto;
-            padding: 0 20px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 24px;
-        }
-
-        .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 24px;
-            padding: 35px 28px;
-            transition: var(--transition-smooth);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
-        }
-        .card:hover {
-            transform: translateY(-8px);
-            border-color: var(--border-glow);
-            box-shadow: 0 25px 50px rgba(0, 255, 204, 0.08);
-        }
-
-        .card-top { margin-bottom: 22px; }
-        .card-icon-box {
-            width: 60px;
-            height: 60px;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 26px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid var(--border-color);
-            transition: transform 0.3s ease;
-        }
-        .card:hover .card-icon-box { transform: scale(1.1) rotate(5deg); }
-
-        .card h3 {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 12px;
-            color: #fff;
-        }
-
-        .card p {
-            color: var(--text-muted);
-            font-size: 14px;
-            margin-bottom: 30px;
-            line-height: 1.7;
-        }
-
-        .card-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.04);
-            color: var(--text-main);
-            border: 1px solid var(--border-color);
-            padding: 14px 20px;
-            border-radius: 14px;
-            font-weight: 700;
-            text-decoration: none;
-            transition: var(--transition-smooth);
-            font-size: 15px;
-        }
-        .card:hover .card-btn {
-            background: var(--accent-cyan);
-            color: var(--bg-deep);
-            border-color: var(--accent-cyan);
-            box-shadow: 0 0 20px var(--border-glow);
-        }
-
-        /* New Dev Tools Section Styling */
-        .code-snippet-box {
-            background: rgba(3, 5, 8, 0.6);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 14px;
-            font-family: var(--font-mono);
-            font-size: 12px;
-            color: var(--accent-cyan);
-            margin-bottom: 20px;
-            overflow-x: auto;
-        }
-
-        /* Support Page */
-        .support-container {
-            width: 100%;
-            max-width: 900px;
-            margin: 20px auto 60px auto;
-            padding: 0 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 40px;
-        }
-
-        .faq-section, .ticket-section {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 24px;
-            padding: 40px;
-        }
-
-        .faq-item {
-            border-bottom: 1px solid var(--border-color);
-            padding: 20px 0;
-        }
-        .faq-item:first-child { padding-top: 0; }
-        .faq-item:last-child { border-bottom: none; padding-bottom: 0; }
-
-        .faq-question {
-            font-weight: 700;
-            font-size: 16px;
-            color: #fff;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-        }
-        .faq-question span { color: var(--accent-cyan); font-size: 20px; transition: transform 0.3s ease; }
-        .faq-item.active .faq-question span { transform: rotate(45deg); }
-
-        .faq-answer {
-            color: var(--text-muted);
-            font-size: 14px;
-            max-height: 0;
-            overflow: hidden;
-            opacity: 0;
-            transition: all 0.4s ease;
-            line-height: 1.7;
-        }
-        .faq-item.active .faq-answer { max-height: 200px; opacity: 1; margin-top: 14px; }
-
-        .form-group { margin-bottom: 24px; }
-        label {
-            display: block;
-            font-size: 12px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        input, textarea, select {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--border-color);
-            border-radius: 14px;
-            padding: 16px;
-            color: var(--text-main);
-            font-family: inherit;
-            font-size: 15px;
-            outline: none;
-            transition: var(--transition-smooth);
-        }
-        input:focus, textarea:focus, select:focus { border-color: var(--accent-cyan); background: rgba(255,255,255,0.06); }
-        textarea { resize: vertical; height: 140px; }
-
-        .submit-btn {
-            width: 100%;
-            background: var(--accent-cyan);
-            color: var(--bg-deep);
-            border: none;
-            padding: 16px;
-            border-radius: 14px;
-            font-weight: 800;
-            font-size: 16px;
-            cursor: pointer;
-            box-shadow: 0 0 25px var(--border-glow);
-            transition: var(--transition-smooth);
-        }
-        .submit-btn:hover { opacity: 0.9; transform: translateY(-2px); }
-
-        #success-msg {
-            display: none;
-            background: rgba(0, 255, 204, 0.1);
-            border: 1px solid var(--border-glow);
-            color: var(--accent-cyan);
-            padding: 20px;
-            border-radius: 16px;
-            text-align: center;
-            font-weight: 700;
-            margin-bottom: 25px;
-        }
-
-        /* Cookie Consent Banner */
-        .cookie-banner {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%) translateY(150%);
-            width: calc(100% - 40px);
-            max-width: 680px;
-            background: rgba(10, 15, 29, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border-glow);
-            border-radius: 20px;
-            padding: 22px 28px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
-            z-index: 2000;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 20px;
-            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .cookie-banner.show { transform: translateX(-50%) translateY(0); }
-        .cookie-text { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
-        .cookie-text strong { color: #fff; }
-        .cookie-btns { display: flex; gap: 10px; flex-shrink: 0; }
-        .cookie-accept {
-            background: var(--accent-cyan); color: var(--bg-deep); border: none;
-            padding: 10px 20px; border-radius: 12px; font-weight: 800; font-size: 13px; cursor: pointer;
-        }
-        .cookie-decline {
-            background: rgba(255, 255, 255, 0.05); color: var(--text-muted); border: 1px solid var(--border-color);
-            padding: 10px 16px; border-radius: 12px; font-weight: 700; font-size: 13px; cursor: pointer;
-        }
-
-        footer {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-muted);
-            font-size: 13px;
-            border-top: 1px solid var(--border-color);
-            background: rgba(3, 5, 8, 0.9);
-        }
-
-        @media (max-width: 768px) {
-            nav { padding: 14px 20px; }
-            .container { grid-template-columns: 1fr; }
-            .section-header-flex { flex-direction: column; align-items: flex-start; }
-            .game-controls { width: 100%; }
-            .search-box { width: 100%; }
-            .cookie-banner { flex-direction: column; text-align: center; }
-            .cookie-btns { width: 100%; justify-content: center; }
-        }
+        body { font-family: sans-serif; text-align: center; background: #2f3136; color: white; margin: 0; padding: 20px; }
+        #container { position: relative; margin: 20px auto; width: 800px; height: 600px; }
+        video { display: none; } /* Κρυφό, παίρνουμε μόνο τα pixels */
+        canvas { position: absolute; left: 0; top: 0; width: 100%; height: 100%; border: 3px solid #5865F2; border-radius: 8px; background: #202225; }
+        button { background: #5865F2; color: white; border: none; padding: 15px 30px; font-size: 16px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #4752C4; }
+        #status { color: #faa61a; font-weight: bold; margin-bottom: 15px; font-size: 18px; }
     </style>
 </head>
 <body>
 
-    <div class="announcement-bar" id="announcement-bar">
-        <span>🔥 Welcome to the official 4PCTEAM portal! Explore our latest Roblox experiences & Luau tools!</span>
-        <button class="announcement-close" onclick="dismissAnnouncement()">✕</button>
-    </div>
+    <h1>Discord Screen Tracker (MediaPipe HTML)</h1>
+    <div id="status">Πατήστε το κουμπί και επιλέξτε το παράθυρο του Discord...</div>
+    <button id="start-btn">Έναρξη Καταγραφής Παραθύρου</button>
 
-    <canvas id="particle-canvas"></canvas>
-    <div class="ambient-glow"></div>
-
-    <nav>
-        <a class="nav-logo" onclick="switchPage('home')">4PCTEAM</a>
-        <div class="nav-right-cluster">
-            <button class="icon-btn" id="audio-toggle" onclick="toggleAudio()" title="Audio Toggle">🔊</button>
-            <div class="control-group">
-                <button class="theme-btn cyan active" onclick="setTheme('cyan')" title="Cyan"></button>
-                <button class="theme-btn purple" onclick="setTheme('purple')" title="Purple"></button>
-                <button class="theme-btn green" onclick="setTheme('green')" title="Green"></button>
-                <button class="theme-btn gold" onclick="setTheme('gold')" title="Gold"></button>
-            </div>
-            <div class="nav-links">
-                <a id="nav-home" class="active" onclick="switchPage('home')">Home</a>
-                <a id="nav-support" onclick="switchPage('support')">Support</a>
-            </div>
-        </div>
-    </nav>
-
-    <!-- HOME PAGE -->
-    <div id="page-home" class="page-view active">
-        <header>
-            <div class="studio-badge">
-                <div class="status-dot"></div> Elite Roblox Development Studio
-            </div>
-            <h1>4PCTEAM</h1>
-            <p class="subtitle">Crafting cutting-edge games, immersive multiplayer mechanics, and building a vibrant developer ecosystem on Roblox.</p>
-            <div class="hero-actions">
-                <a href="#games-section" class="btn-primary" onclick="playSound()">Explore Games</a>
-                <a href="https://discord.gg/DEsPSh43q3" target="_blank" rel="noopener noreferrer" class="btn-secondary" onclick="playSound()">Join Discord</a>
-            </div>
-        </header>
-
-        <div class="stats-container">
-            <div class="stat-card">
-                <div class="stat-number">4+</div>
-                <div class="stat-label">Published Games</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">100%</div>
-                <div class="stat-label">Studio Dedication</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">Active</div>
-                <div class="stat-label">Community & Devs</div>
-            </div>
-        </div>
-
-        <div class="section-header-flex">
-            <div class="section-title">🌐 Community & Socials</div>
-        </div>
-        <div class="container">
-            <div class="card">
-                <div>
-                    <div class="card-top"><div class="card-icon-box">💬</div></div>
-                    <h3>Discord Community</h3>
-                    <p>Connect with fellow developers, get instant announcements on game updates, and participate in community events.</p>
-                </div>
-                <a href="https://discord.gg/DEsPSh43q3" target="_blank" rel="noopener noreferrer" class="card-btn" onclick="playSound()">Join Discord Server</a>
-            </div>
-
-            <div class="card">
-                <div>
-                    <div class="card-top"><div class="card-icon-box">🎮</div></div>
-                    <h3>Roblox Group</h3>
-                    <p>Visit our official community group (Bill Skaf Studios) on Roblox to support our projects and unlock group perks!</p>
-                </div>
-                <a href="https://www.roblox.com/communities/612987225/Bill-Skaf-Studios" target="_blank" rel="noopener noreferrer" class="card-btn" onclick="playSound()">Visit Roblox Group</a>
-            </div>
-
-            <div class="card">
-                <div>
-                    <div class="card-top"><div class="card-icon-box">📺</div></div>
-                    <h3>YouTube Channel</h3>
-                    <p>Watch official game trailers, exclusive devlogs, scripting tutorials, and behind-the-scenes content.</p>
-                </div>
-                <a href="https://www.youtube.com/@4PCTEAM" target="_blank" rel="noopener noreferrer" class="card-btn" onclick="playSound()">Subscribe on YouTube</a>
-            </div>
-        </div>
-
-        <!-- NEW ADDITION: Developer Tools & Luau Snippets Section -->
-        <div class="section-header-flex">
-            <div class="section-title">⚡ Developer Tools & Luau Snippets</div>
-        </div>
-        <div class="container">
-            <div class="card">
-                <div>
-                    <div class="card-top"><div class="card-icon-box">💻</div></div>
-                    <h3>Custom Admin System</h3>
-                    <div class="code-snippet-box">local 4pcAdmin = require(script.AdminCore); 4pcAdmin:Initialize()</div>
-                    <p>Lightweight modular admin commands optimized for multiplayer Roblox experiences with zero lag.</p>
-                </div>
-                <a href="https://discord.gg/DEsPSh43q3" target="_blank" rel="noopener noreferrer" class="card-btn" onclick="playSound()">Get Script on Discord</a>
-            </div>
-
-            <div class="card">
-                <div>
-                    <div class="card-top"><div class="card-icon-box">🛠️</div></div>
-                    <h3>Tycoon DataSaver</h3>
-                    <div class="code-snippet-box">local DSS = game:GetService("DataStoreService"); -- 4PCTEAM Safe Save</div>
-                    <p>Reliable ProfileService wrapper guaranteeing zero data loss for player currencies and tycoon progress.</p>
-                </div>
-                <a href="https://discord.gg/DEsPSh43q3" target="_blank" rel="noopener noreferrer" class="card-btn" onclick="playSound()">Get Script on Discord</a>
-            </div>
-        </div>
-
-        <div id="games-section" class="section-header-flex">
-            <div class="section-title">🎮 Our Games</div>
-            <div class="game-controls">
-                <input type="text" id="game-search" class="search-box" placeholder="Search games..." oninput="filterGames()">
-                <button class="filter-btn active" onclick="setCategoryFilter('all', this)">All</button>
-                <button class="filter-btn" onclick="setCategoryFilter('tycoon', this)">Tycoon</button>
-                <button class="filter-btn" onclick="setCategoryFilter('shooter', this)">Shooter</button>
-                <button class="filter-btn" onclick="setCategoryFilter('casual', this)">Casual</button>
-                <button class="random-game-btn" onclick="pickRandomGame()">🎲 Random Game!</button>
-            </div>
-        </div>
-
-        <div class="container" id="games-container">
-            <div class="card" data-title="parkour and tycoon" data-category="tycoon">
-                <div>
-                    <div class="card-top"><div class="card-icon-box">⚡</div></div>
-                    <h3>Parkour and Tycoon</h3>
-                    <p>Combine high-octane parkour movement skills with strategic economic tycoon management in this unique hybrid experience.</p>
-                </div>
-                <a href="https://www.roblox.com/games/111545675146001/Parkour-and-Tycoon" target="_blank" rel="noopener noreferrer" class="card-btn" onclick="playSound()">Play on Roblox</a>
-            </div>
-
-            <div class="card" data-title="kinder hatch" data-category="casual">
-                <div>
-                    <div class="card-top"><div class="card-icon-box">🥚</div></div>
-                    <h3>Kinder Hatch</h3>
-                    <p>Explore a vibrant world, hatch mystery eggs, and collect rare companion characters in this engaging simulator.</p>
-                </div>
-                <a href="https://www.roblox.com/games/133304947902903/Kinder-Hatch" target="_blank" rel="noopener noreferrer" class="card-btn" onclick="playSound()">Play on Roblox</a>
-            </div>
-
-            <div class="card" data-title="realistic gun game" data-category="shooter">
-                <div>
-                    <div class="card-top"><div class="card-icon-box">🎯</div></div>
-                    <h3>Realistic Gun Game</h3>
-                    <p>Test your reflexes and tactical combat skills in this fast-paced shooter featuring realistic weaponry.</p>
-                </div>
-                <a href="https://www.roblox.com/games/70779070700175/Realistic-gun-game" target="_blank" rel="noopener noreferrer" class="card-btn" onclick="playSound()">Play on Roblox</a>
-            </div>
-
-            <div class="card" data-title="shooter game" data-category="shooter">
-                <div>
-                    <div class="card-top"><div class="card-icon-box">🔫</div></div>
-                    <h3>SHOOTER GAME</h3>
-                    <p>Jump straight into high-intensity action battles, master advanced gunplay, and dominate the leaderboard.</p>
-                </div>
-                <a href="https://www.roblox.com/games/92412466953609/SHOOTER-GAME" target="_blank" rel="noopener noreferrer" class="card-btn" onclick="playSound()">Play on Roblox</a>
-            </div>
-        </div>
-
-        <div class="section-header-flex">
-            <div class="section-title">👥 The Core Team</div>
-        </div>
-        <div class="container">
-            <div class="card">
-                <div>
-                    <div class="card-top"><div class="card-icon-box">👑</div></div>
-                    <h3>Bill Skaf</h3>
-                    <p>Founder, Lead Developer & Lead Scripter. Architecting the Luau game systems, UI frameworks, and overall vision for 4PCTEAM.</p>
-                </div>
-                <a href="https://www.roblox.com/communities/612987225/Bill-Skaf-Studios" target="_blank" rel="noopener noreferrer" class="card-btn" onclick="playSound()">View Profile</a>
-            </div>
-
-            <div class="card">
-                <div>
-                    <div class="card-top"><div class="card-icon-box">💡</div></div>
-                    <h3>4PCTEAM Contributors</h3>
-                    <p>Talented builders, community moderators, and developers collaborating on testing and special map designs.</p>
-                </div>
-                <a href="https://discord.gg/DEsPSh43q3" target="_blank" rel="noopener noreferrer" class="card-btn" onclick="playSound()">Meet the Community</a>
-            </div>
-        </div>
-    </div>
-
-    <!-- SUPPORT PAGE -->
-    <div id="page-support" class="page-view">
-        <header>
-            <div class="studio-badge">
-                <div class="status-dot"></div> Help Center & Support
-            </div>
-            <h1>Support & FAQ</h1>
-            <p class="subtitle">Have questions about our games or bug reports? Check our FAQ or submit a ticket below.</p>
-        </header>
-
-        <div class="support-container">
-            <div class="faq-section">
-                <h3 style="margin-bottom: 24px; font-size: 20px;">Frequently Asked Questions</h3>
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFaq(this)">How can I join the 4PCTEAM Roblox Group? <span>+</span></div>
-                    <div class="faq-answer">Simply visit our official Roblox group (Bill Skaf Studios) linked on the homepage and click the "Join Group" button.</div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFaq(this)">Where can I report bugs or glitches? <span>+</span></div>
-                    <div class="faq-answer">You can report bugs in our Discord server or by submitting a support ticket below.</div>
-                </div>
-            </div>
-
-            <div class="ticket-section">
-                <h3 style="margin-bottom: 24px; font-size: 20px;">Submit a Support Ticket</h3>
-                <div id="success-msg">🎉 Ticket submitted successfully! Our team will review your request shortly.</div>
-                <form id="ticket-form" onsubmit="submitTicket(event)">
-                    <div class="form-group">
-                        <label for="ticket-name">Your Username</label>
-                        <input type="text" id="ticket-name" required placeholder="e.g. BillSkaf">
-                    </div>
-                    <div class="form-group">
-                        <label for="ticket-message">Message</label>
-                        <textarea id="ticket-message" required placeholder="Describe your issue..."></textarea>
-                    </div>
-                    <button type="submit" class="submit-btn" onclick="playSound()">Send Support Ticket</button>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <footer>
-        <p>&copy; 2026 4PCTEAM & Bill Skaf Studios. All rights reserved. Built with passion for Roblox.</p>
-    </footer>
-
-    <!-- Cookie Consent Banner -->
-    <div class="cookie-banner" id="cookie-banner">
-        <div class="cookie-text">
-            <strong>🍪 Cookie Notice:</strong> We use local preferences to remember your theme settings and sound toggles.
-        </div>
-        <div class="cookie-btns">
-            <button class="cookie-accept" onclick="acceptCookies()">Accept</button>
-            <button class="cookie-decline" onclick="declineCookies()">Decline</button>
-        </div>
+    <div id="container">
+        <video id="input-video" autoplay playsinline muted></video>
+        <canvas id="output-canvas" width="800" height="600"></canvas>
     </div>
 
     <script>
-        // --- Web Audio API Procedural Sound Effects ---
-        let audioEnabled = true;
-        let audioCtx = null;
+        const videoElement = document.getElementById('input-video');
+        const canvasElement = document.getElementById('output-canvas');
+        const canvasCtx = canvasElement.getContext('2d');
+        const startBtn = document.getElementById('start-btn');
+        const statusDiv = document.getElementById('status');
 
-        function playSound() {
-            if (!audioEnabled) return;
+        // Ρύθμιση του Holistic Μοντέλου (Σώμα, Χέρια, Μάτια/Πρόσωπο)
+        const holistic = new Holistic({
+            locateFile: (file) => {
+                return `https://jsdelivr.net{file}`;
+            }
+        });
+
+        holistic.setOptions({
+            modelComplexity: 1,
+            smoothLandmarks: true,
+            minDetectionConfidence: 0.5,
+            minTrackingConfidence: 0.5
+        });
+
+        // Αυτό τρέχει κάθε φορά που το MediaPipe βρίσκει σκελετό/μάτια/χέρια
+        holistic.onResults((results) => {
+            canvasCtx.save();
+            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+            
+            // Σχεδίαση της εικόνας του Discord στο background
+            canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+
+            // 1. Σχεδίαση Προσώπου & Ματιών (Μπλε)
+            if (results.faceLandmarks) {
+                drawConnectors(canvasCtx, results.faceLandmarks, FACEMESH_CONTOURS, {color: '#00FFFF', lineWidth: 1});
+            }
+            
+            // 2. Σχεδίαση Σώματος / Pose (Πράσινο)
+            if (results.poseLandmarks) {
+                drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, {color: '#00FF00', lineWidth: 2});
+                drawLandmarks(canvasCtx, results.poseLandmarks, {color: '#00FF00', lineWidth: 1, radius: 2});
+            }
+
+            // 3. Σχεδίαση Αριστερού Χεριού (Κόκκινο)
+            if (results.leftHandLandmarks) {
+                drawConnectors(canvasCtx, results.leftHandLandmarks, HAND_CONNECTIONS, {color: '#FF0000', lineWidth: 2});
+                drawLandmarks(canvasCtx, results.leftHandLandmarks, {color: '#FF0000', lineWidth: 1, radius: 2});
+            }
+
+            // 4. Σχεδίαση Δεξιού Χεριού (Κόκκινο)
+            if (results.rightHandLandmarks) {
+                drawConnectors(canvasCtx, results.rightHandLandmarks, HAND_CONNECTIONS, {color: '#FF0000', lineWidth: 2});
+                drawLandmarks(canvasCtx, results.rightHandLandmarks, {color: '#FF0000', lineWidth: 1, radius: 2});
+            }
+            
+            canvasCtx.restore();
+        });
+
+        // Event για το κουμπί
+        startBtn.addEventListener('click', async () => {
             try {
-                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                if (audioCtx.state === 'suspended') audioCtx.resume();
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                const now = audioCtx.currentTime;
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(580, now);
-                osc.frequency.exponentialRampToValueAtTime(880, now + 0.08);
-                gain.gain.setValueAtTime(0.08, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
-                osc.start(now);
-                osc.stop(now + 0.08);
-            } catch (e) {}
-        }
+                // Ζητάει από τον browser να επιλέξεις παράθυρο
+                const stream = await navigator.mediaDevices.getDisplayMedia({
+                    video: { displaySurface: "window" },
+                    audio: false
+                });
+                
+                videoElement.srcObject = stream;
+                statusDiv.innerText = "Το μοντέλο επεξεργάζεται το παράθυρο...";
+                statusDiv.style.color = "#43b581";
 
-        function toggleAudio() {
-            audioEnabled = !audioEnabled;
-            document.getElementById('audio-toggle').textContent = audioEnabled ? '🔊' : '🔇';
-            playSound();
-        }
-
-        function setTheme(themeName) {
-            playSound();
-            document.body.className = '';
-            if (themeName !== 'cyan') document.body.classList.add('theme-' + themeName);
-            document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
-            event.currentTarget.classList.add('active');
-            localStorage.setItem('4pcteam_theme', themeName);
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedTheme = localStorage.getItem('4pcteam_theme');
-            if (savedTheme) {
-                const btn = document.querySelector(`.theme-btn.${savedTheme}`);
-                if (btn) btn.click();
-            }
-            if (!localStorage.getItem('4pcteam_cookies')) {
-                setTimeout(() => document.getElementById('cookie-banner').classList.add('show'), 1000);
-            }
-        });
-
-        function switchPage(pageId) {
-            playSound();
-            document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
-            document.getElementById('page-' + pageId).classList.add('active');
-            document.getElementById('nav-' + pageId).classList.add('active');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function dismissAnnouncement() {
-            playSound();
-            const bar = document.getElementById('announcement-bar');
-            bar.style.transition = 'all 0.4s ease';
-            bar.style.opacity = '0';
-            bar.style.maxHeight = '0';
-            bar.style.padding = '0';
-            setTimeout(() => bar.remove(), 400);
-        }
-
-        // --- Interactive Particle Canvas with Mouse Tracking ---
-        const canvas = document.getElementById('particle-canvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
-        let mouse = { x: null, y: null, radius: 120 };
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        window.addEventListener('mousemove', (e) => {
-            mouse.x = e.clientX;
-            mouse.y = e.clientY;
-        });
-
-        class Particle {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.vx = (Math.random() - 0.5) * 0.8;
-                this.vy = (Math.random() - 0.5) * 0.8;
-                this.size = Math.random() * 2 + 1;
-            }
-            update() {
-                this.x += this.vx;
-                this.y += this.vy;
-                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
-                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
-
-                let dx = mouse.x - this.x;
-                let dy = mouse.y - this.y;
-                let dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist < mouse.radius) {
-                    let angle = Math.atan2(dy, dx);
-                    this.x -= Math.cos(angle) * 1.5;
-                    this.y -= Math.sin(angle) * 1.5;
-                }
-            }
-            draw() {
-                ctx.fillStyle = 'rgba(0, 255, 204, 0.45)';
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
-
-        function initParticles() {
-            particles = [];
-            let count = Math.floor((canvas.width * canvas.height) / 14000);
-            for (let i = 0; i < count; i++) particles.push(new Particle());
-        }
-        initParticles();
-
-        function animateParticles() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (let i = 0; i < particles.length; i++) {
-                particles[i].update();
-                particles[i].draw();
-
-                for (let j = i + 1; j < particles.length; j++) {
-                    let dx = particles[i].x - particles[j].x;
-                    let dy = particles[i].y - particles[j].y;
-                    let dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < 110) {
-                        ctx.strokeStyle = `rgba(0, 255, 204, ${0.15 * (1 - dist / 110)})`;
-                        ctx.lineWidth = 1;
-                        ctx.beginPath();
-                        ctx.moveTo(particles[i].x, particles[i].y);
-                        ctx.lineTo(particles[j].x, particles[j].y);
-                        ctx.stroke();
+                // Στέλνουμε τα frames για ανάλυση
+                async function onFrame() {
+                    if (!videoElement.paused && !videoElement.ended) {
+                        await holistic.send({ image: videoElement });
                     }
+                    requestAnimationFrame(onFrame);
                 }
+
+                videoElement.onloadedmetadata = () => {
+                    videoElement.play();
+                    onFrame();
+                };
+
+            } catch (err) {
+                console.error(err);
+                statusDiv.innerText = "Αποτυχία πρόσβασης στο παράθυρο.";
+                statusDiv.style.color = "#f04747";
             }
-            requestAnimationFrame(animateParticles);
-        }
-        animateParticles();
-
-        function filterGames() {
-            const query = document.getElementById('game-search').value.toLowerCase();
-            document.querySelectorAll('#games-container .card').forEach(card => {
-                const title = card.getAttribute('data-title');
-                card.style.display = title.includes(query) ? 'flex' : 'none';
-            });
-        }
-
-        function setCategoryFilter(category, btn) {
-            playSound();
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            document.querySelectorAll('#games-container .card').forEach(card => {
-                const cat = card.getAttribute('data-category');
-                card.style.display = (category === 'all' || cat === category) ? 'flex' : 'none';
-            });
-        }
-
-        function pickRandomGame() {
-            playSound();
-            const cards = Array.from(document.querySelectorAll('#games-container .card')).filter(c => c.style.display !== 'none');
-            if (!cards.length) return;
-            const randomCard = cards[Math.floor(Math.random() * cards.length)];
-            randomCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            randomCard.style.borderColor = 'var(--accent-cyan)';
-            setTimeout(() => randomCard.style.borderColor = 'var(--border-color)', 2000);
-        }
-
-        function toggleFaq(el) {
-            playSound();
-            el.parentElement.classList.toggle('active');
-        }
-
-        function submitTicket(e) {
-            e.preventDefault();
-            playSound();
-            document.getElementById('ticket-form').style.display = 'none';
-            document.getElementById('success-msg').style.display = 'block';
-        }
-
-        function acceptCookies() {
-            playSound();
-            localStorage.setItem('4pcteam_cookies', 'accepted');
-            document.getElementById('cookie-banner').classList.remove('show');
-        }
-
-        function declineCookies() {
-            playSound();
-            localStorage.setItem('4pcteam_cookies', 'declined');
-            document.getElementById('cookie-banner').classList.remove('show');
-        }
+        });
     </script>
 </body>
 </html>
